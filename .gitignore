@@ -1,2 +1,9 @@
 # GCC output files
 *.o
+
+# LateX
+*.pdf
+*.log
+*.aux
+*.gz
+*.dvi

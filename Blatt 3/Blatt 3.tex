@@ -1,0 +1,50 @@
+\documentclass[12pt,a4paper]{article}
+\onehalfspacing
+\usepackage[utf8]{inputenc}
+\usepackage[german]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{color}
+\usepackage{xcolor}
+\colorlet{keywordstylecolor}{green!40!black}
+\colorlet{commentstyle}{purple!40!black}
+\usepackage{listings}
+\lstdefinestyle{customc}{
+  belowcaptionskip=1\baselineskip,
+  breaklines=true,
+  frame=L,
+  xleftmargin=\parindent,
+  language=C,
+  showstringspaces=false,
+  basicstyle=\footnotesize\ttfamily,
+  keywordstyle=\bfseries\color{keywordstylecolor},
+  commentstyle=\itshape\color{commentstyle},
+  identifierstyle=\color{blue},
+  stringstyle=\color{orange},
+  numbers=left,
+  stepnumber=5,
+  numberfirstline=false
+}
+%\lstset{language=C}
+\usepackage{siunitx}
+\author{Till Busse, Florian Ölsner}
+\title{Parallele Programmierung Blatt 3}
+\begin{document}
+\maketitle
+\pagebreak
+\section{Aufgabe 1 - Overhead bei Erzeugung von Posix Threads}
+\subsection{PosixOverhead Code}
+\lstset{escapechar=@,style=customc}
+\lstinputlisting[firstline=14,escapechar=@,style=customc]{/Users/tillbusse/repositories/PP/PosixOverhead/main.c}
+
+\subsection{Ausführungszeit und Bedeutung}
+Das Program braucht bei 10 Ausführungen im Mittel eine Zeit von 0.262s. Die Erstellung eines Threads braucht dementsprechend 26 \SI{1.55}{\micro\second}.Das Erstellen und Joinen von Threads ist sehr schnell, darf dennoch nicht vernachlässigt werden. Für sehr kleine Operationen könnte der entstehende Overhead den gewonnen Geschwindigkeitsvorteil durch die Parallelisierung übersteigen.
+\pagebreak
+\section{Aufgabe 2 - Matrix-Multiplikation mit Posix Threads}
+\subsection{Matrix-Multiplikation Code}
+\lstinputlisting[firstline=10,escapechar=@,style=customc]{/Users/tillbusse/repositories/PP/MatrixMult/matmult.c}
+\subsection{Optimale Thread Anzahl für DIM=2000}
+\section{Thread-paralleles Sortieren}
+\end{document}

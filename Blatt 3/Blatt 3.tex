@@ -36,14 +36,21 @@
 \section{Overhead bei Erzeugung von Posix Threads}
 \subsection{PosixOverhead Code}
 \lstset{escapechar=@,style=customc}
-\lstinputlisting[firstline=14,escapechar=@,style=customc]{/Users/tillbusse/repositories/PP/PosixOverhead/main.c}
-
+\lstinputlisting[firstline=14,escapechar=@,style=customc,caption=Programmcode]{../PosixOverhead/main.c}
 \subsection{Ausführungszeit und Bedeutung}
-Das Program braucht bei 10 Ausführungen im Mittel eine Zeit von 0.262s. Die Erstellung eines Threads braucht dementsprechend 26 \SI{1.55}{\micro\second}.Das Erstellen und Joinen von Threads ist sehr schnell, darf dennoch nicht vernachlässigt werden. Für sehr kleine Operationen könnte der entstehende Overhead den gewonnen Geschwindigkeitsvorteil durch die Parallelisierung übersteigen.
+Das Program braucht bei 10 Ausführungen im Mittel eine Zeit von 0.262s. Die Erstellung eines Threads braucht dementsprechend 26 \SI{1.55}{\micro\second}. Das Erstellen und Joinen von Threads ist sehr schnell, darf dennoch nicht vernachlässigt werden. Für sehr kleine Operationen könnte der entstehende Overhead den gewonnen Geschwindigkeitsvorteil durch die Parallelisierung übersteigen.
 \pagebreak
 \section{Matrix-Multiplikation mit Posix Threads}
 \subsection{Matrix-Multiplikation Code}
-\lstinputlisting[firstline=10,escapechar=@,style=customc]{/Users/tillbusse/repositories/PP/MatrixMult/matmult.c}
+Der folgende Code multipliziert zwei Matrizen, indem er die Matrix X zeilenweise auf die Threads aufteilt (mit zyklischer Datendekomposition). Es wurden dafür zwei verschiedene Alogrithmen entwickelt. 
+\lstinputlisting[firstline=10,escapechar=@,style=customc,caption=Programmcode]{../MatrixMult/matmult.c}
+\lstinputlisting[language=bash,caption=Bash script für Zeitmessung]{../MatrixMult/performance.sh}
 \subsection{Optimale Thread Anzahl für DIM=2000}
+Die Zeitmessung für die Matrixmultiplikation mit einer Matrixdimension von 2000 haben auf dem Xeon Phi die folgenden Ergebnisse geliefert:
+\lstinputlisting[language=bash,caption=Ergebins für Zeitmessung auf dem Xeon Phi]{../MatrixMult/performanceResult.phi}
+Bei 2 Threads wird bereits ein Speedup von 2 erreicht, bei 4 Threads beträgt der Speedup nur noch 3. Der maximale Speedup von ca. 20 wird bei ungefähr 128 Threads erreicht.\\
+Das Ergebnis zeigt dass sich der Overhead beim Erstellen von vielen Threads negativ auf das Ergebnis auswirkt.
 \section{Thread-paralleles Sortieren}
+Für jedes Elemt in dem Feld wird eine Mutex variable benötigt. Zusätzlich wird eine Mutex Variable für die globalSwap Variable eingesetzt, welche für die terminierende Variante des Algorithmus benötigt wird.
+\lstinputlisting[language=bash,caption=Sortieralgorithmus code]{../ThreadSort/threadsort.c}
 \end{document}

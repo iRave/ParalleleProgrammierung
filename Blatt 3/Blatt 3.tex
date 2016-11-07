@@ -1,5 +1,4 @@
 \documentclass[12pt,a4paper]{article}
-\onehalfspacing
 \usepackage[utf8]{inputenc}
 \usepackage[german]{babel}
 \usepackage[T1]{fontenc}
@@ -34,7 +33,7 @@
 \begin{document}
 \maketitle
 \pagebreak
-\section{Aufgabe 1 - Overhead bei Erzeugung von Posix Threads}
+\section{Overhead bei Erzeugung von Posix Threads}
 \subsection{PosixOverhead Code}
 \lstset{escapechar=@,style=customc}
 \lstinputlisting[firstline=14,escapechar=@,style=customc]{/Users/tillbusse/repositories/PP/PosixOverhead/main.c}
@@ -42,7 +41,7 @@
 \subsection{Ausführungszeit und Bedeutung}
 Das Program braucht bei 10 Ausführungen im Mittel eine Zeit von 0.262s. Die Erstellung eines Threads braucht dementsprechend 26 \SI{1.55}{\micro\second}.Das Erstellen und Joinen von Threads ist sehr schnell, darf dennoch nicht vernachlässigt werden. Für sehr kleine Operationen könnte der entstehende Overhead den gewonnen Geschwindigkeitsvorteil durch die Parallelisierung übersteigen.
 \pagebreak
-\section{Aufgabe 2 - Matrix-Multiplikation mit Posix Threads}
+\section{Matrix-Multiplikation mit Posix Threads}
 \subsection{Matrix-Multiplikation Code}
 \lstinputlisting[firstline=10,escapechar=@,style=customc]{/Users/tillbusse/repositories/PP/MatrixMult/matmult.c}
 \subsection{Optimale Thread Anzahl für DIM=2000}

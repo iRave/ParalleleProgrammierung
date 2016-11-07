@@ -1,0 +1,28 @@
+threadCount = 1
+60.16
+threadCount = 2
+33.55
+threadCount = 4
+22.42
+threadCount = 8
+8.33
+threadCount = 16
+4.76
+threadCount = 32
+3.94
+threadCount = 64
+2.88
+threadCount = 128
+2.85
+threadCount = 256
+2.92
+threadCount = 512
+2.95
+threadCount = 1024
+2.94
+threadCount = 2048
+3.00
+threadCount = 4096
+2.95
+threadCount = 8192
+2.96

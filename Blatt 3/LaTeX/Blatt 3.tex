@@ -38,7 +38,7 @@
 \lstset{escapechar=@,style=customc}
 \lstinputlisting[firstline=14,escapechar=@,style=customc,caption=Programmcode]{../PosixOverhead/main.c}
 \subsection{Ausführungszeit und Bedeutung}
-Das Program braucht bei 10 Ausführungen im Mittel eine Zeit von 0.262s. Die Erstellung eines Threads braucht dementsprechend 26 \SI{1.55}{\micro\second}. Das Erstellen und Joinen von Threads ist sehr schnell, darf dennoch nicht vernachlässigt werden. Für sehr kleine Operationen könnte der entstehende Overhead den gewonnen Geschwindigkeitsvorteil durch die Parallelisierung übersteigen.
+Das Program braucht bei 10 Ausführungen im Mittel eine Zeit von 0.262s. Die Erstellung eines Threads braucht dementsprechend \SI{26}{\micro\second}. Das Erstellen und Joinen von Threads ist sehr schnell, darf dennoch nicht vernachlässigt werden. Für sehr kleine Operationen könnte der entstehende Overhead den gewonnen Geschwindigkeitsvorteil durch die Parallelisierung übersteigen.
 \pagebreak
 \section{Matrix-Multiplikation mit Posix Threads}
 \subsection{Matrix-Multiplikation Code}

@@ -5,19 +5,20 @@
 #include <time.h>
 #include <omp.h>
 #include <unistd.h>
-#define N 1000
+#define N 100000
+#define MAX_DEPTH 3
+#define MIN_ARRAY_SIZE 250
 
 int a[N];
-int recCount = 0;
 
-void quickSort(int arr[], int left, int right)
+void quickSort(int arr[], int left, int right, int depth)
 {
 	int i = left, j = right;
 	int tmp;
 	int pivot = arr[(left + right) / 2];
-
-  omp_set_num_threads(2);
-  #pragma omp parallel shared(arr,pivot,left,right,i,j) private(tmp) if()
+	int parallelismCondition = (depth < MAX_DEPTH)&&((right-left) > MIN_ARRAY_SIZE);
+  #pragma omp parallel shared(arr,pivot,left,right,i,j) private(tmp) \
+	 if(parallelismCondition)
   {
     while (i <= j) {
       #pragma omp barrier
@@ -54,7 +55,7 @@ void quickSort(int arr[], int left, int right)
       {
         if (left < j)
         {
-          quickSort(arr, left, j);
+          quickSort(arr, left, j, ++depth);
         }
 
       }
@@ -62,7 +63,7 @@ void quickSort(int arr[], int left, int right)
       {
         if (i < right)
         {
-          quickSort(arr, i, right);
+          quickSort(arr, i, right, ++depth);
         }
       }
     }
@@ -73,20 +74,23 @@ void quickSort(int arr[], int left, int right)
 int main(int argc, char* argv[]) {
   int i;
   omp_set_nested(1);
+  omp_set_num_threads(2);
 	srand ( (unsigned int)time(NULL) );
-
+/*
   printf("Array initial:\n");
 	for(i=0; i<N; i++) {
 		a[i] = rand()%1000;
 		printf("%d ",a[i]);
 	}
 	printf("\n");
-  quickSort(a, 0, N-1);
-
+	*/
+  quickSort(a, 0, N-1, 0);
+/*
 	printf("Array sortiert:\n");
 	for(i=0; i<N; i++) {
 		printf("%d ",a[i]);
 	}
+	*/
 	printf("\n");
 
 	return 0;

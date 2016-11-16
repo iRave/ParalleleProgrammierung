@@ -15,7 +15,7 @@
 #include <time.h>
 
 //#define N 20000000
-#define A2 1
+//#define A2 1
 
 // time our execution time
 void timeFunc(void (*func)(void))
@@ -24,7 +24,7 @@ void timeFunc(void (*func)(void))
 	func();
 	clock_t end = clock();
 	double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-	printf("%f seconds\n",time_spent);
+	//printf("%f seconds\n",time_spent);
 }
 
 #if defined(A1)
@@ -40,8 +40,8 @@ void piLinear()
 		sum += 4.0 / (1.0 + k*k);
 	}
 	pi = sum / N;
-	quadmath_snprintf(buffer, sizeof(buffer),"%.36Qg",pi);
-	printf("%s\n",buffer);
+//	quadmath_snprintf(buffer, sizeof(buffer),"%.36Qg",pi);
+	//printf("%s\n",buffer);
 }
 
 #elif defined(A2)
@@ -59,8 +59,8 @@ void piParallel()
 		sum += 4.0 / (1.0 + k*k);
 	}
 	pi = sum / N;
-	quadmath_snprintf(buffer, sizeof(buffer),"%.36Qg",pi);
-	printf("%s\n",buffer);
+//	quadmath_snprintf(buffer, sizeof(buffer),"%.36Qg",pi);
+//	printf("%s\n",buffer);
 }
 #elif defined(A3)
 #endif

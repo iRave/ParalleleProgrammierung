@@ -1,15 +1,20 @@
 #!/bin/bash
-
-for((threadCount=1; threadCount<10000; threadCount*=2))
+rm out.txt
+for((NC = 1000000; NC <=32000000; NC*=2))
 do
-  echo "threadCount = $threadCount" >> out.txt
-  for((NC = 1000000; NC <=32000000; NC*=2))
+  gcc -D A1 -D N=$NC Blatt4_OpenMP_A2.c -o single.o -lquadmath
+  tSingle=$( { /usr/bin/time -f "%e" ./single.o -args; } 2>&1 )
+  echo "" >> out.txt
+  echo "################################################################" >> out.txt
+  echo "N: $NC" >> out.txt
+  echo "" >> out.txt
+  for((threadCount=1; threadCount<4000; threadCount*=2))
   do
     echo "" >> out.txt
-    echo "NCount = $NC" >> out.txt
-    gcc -D THREAD_COUNT=$threadCount -D N=$NC Blatt4_OpenMP_A2.c -O0 -o main.o -lquadmath -fopenmp 
-  #  /usr/bin/time -f "%e" ./main.o
-    (time ./main.o) >> out.txt 2>&1
-  #time ./main.o
+    echo "ThreadCount = $threadCount" >> out.txt
+    gcc -D THREAD_COUNT=$threadCount -D N=$NC -D A2 Blatt4_OpenMP_A2.c -o multi.o -lquadmath -fopenmp
+    tMulti=$( { /usr/bin/time -f "%e" ./multi.o -args; } 2>&1 )
+    (bc -l <<<"$tSingle/$tMulti") >> out.txt
+    echo "" >> out.txt
   done
 done

@@ -22,13 +22,16 @@ int i;
 double A[N] = { 0,0,0,0,0 }, B[N] = { 1,1,1,1,1 };
 #else
 double A[N], B[N];
-typedef union treeNode_u
+
+typedef struct treeNode_u
 {
   double sum;
   double fromLeft;
 }treeNode;
+
 treeNode sumTree[TREE_HEIGHT][N];
 #endif
+
 double C[N], D[N], E[N];
 double c = 1, x = 1;
 double y, sum = 0;
@@ -113,7 +116,9 @@ void bottomUp()
 
   for(layer = TREE_HEIGHT-1; layer > 0; layer--)
   {
-    for(i = 0; i < pow(2,layer); i += 2)
+	int k = pow(2,layer);
+#pragma omp parallel for shared(sumTree,layer) private(i)
+	for(i = 0; i < k; i += 2)
     {
       sumTree[layer-1][i/2].sum = sumTree[layer][i].sum + sumTree[layer][i+1].sum;
     }
@@ -129,14 +134,26 @@ void topDown()
 
   for(layer = 0; layer < TREE_HEIGHT-1; layer++)
   {
-    for(i = 0; i < pow(2,layer); i++)
+	int k = pow(2,layer);
+#pragma omp parallel for shared(sumTree, layer) private(i)
+    for(i = 0; i < k; i++)
     {
-      sumTree[layer+1][2*i+1].fromLeft = sumTree[layer+1][2*i].sum + sumTree[layer][i].fromLeft;
-      sumTree[layer+1][2*i].fromLeft = sumTree[layer][i].fromLeft;
+    #pragma omp parallel sections
+    	{
+        #pragma omp section
+        {
+          sumTree[layer+1][2*i+1].fromLeft = sumTree[layer+1][2*i].sum + sumTree[layer][i].fromLeft;
+        }
+        #pragma omp section
+        {
+          sumTree[layer+1][2*i].fromLeft = sumTree[layer][i].fromLeft;
+        }
+    	}
     }
   }
 }
 void A3Func(){
+	omp_set_nested(1);
 	init3();
 	bottomUp();
 	topDown();

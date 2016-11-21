@@ -1,5 +1,3 @@
-// Quicksort Algorithm for N numbers
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -9,10 +7,7 @@
 #define MAX_DEPTH 20
 #define MIN_ARRAY_SIZE 100
 
-#define MEGA_PARALLEL 0
-
 int a[N];
-
 void quickSort(int arr[], int left, int right, int depth)
 {
 	int i = left, j = right;
@@ -36,9 +31,9 @@ void quickSort(int arr[], int left, int right, int depth)
 #pragma omp parallel shared(arr,pivot,left,right,i,j) private(tmp) \
   if(parallelismCondition)
     {
-    #pragma omp sections
+#pragma omp sections
     {
-      #pragma omp section
+#pragma omp section
       /* recursion */
       {
         if (left < j)
@@ -47,7 +42,7 @@ void quickSort(int arr[], int left, int right, int depth)
         }
 
       }
-      #pragma omp section
+#pragma omp section
       {
         if (i < right)
         {
@@ -67,19 +62,7 @@ int main(int argc, char* argv[]) {
 //  printf("Array initial:\n");
 	for(i=0; i<N; i++) {
 		a[i] = rand()%1000;
-	//	printf("%d ",a[i]);
 	}
-	//printf("\n");
-	
   quickSort(a, 0, N-1, 0);
-
-	//printf("Array sortiert:\n");
-	for(i=0; i<N; i++) {
-	//	printf("%d ",a[i]);
-	}
-	
-	printf("\n");
-
 	return 0;
-
 }

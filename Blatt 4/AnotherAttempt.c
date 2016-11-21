@@ -8,11 +8,9 @@
 #define N 100000000
 #define MAX_DEPTH 20
 #define MIN_ARRAY_SIZE 100
-
 #define MEGA_PARALLEL 0
 
 int a[N];
-
 void quickSort(int arr[], int left, int right, int depth)
 {
 	int i = left, j = right;
@@ -20,24 +18,24 @@ void quickSort(int arr[], int left, int right, int depth)
 	int pivot = arr[(left + right) / 2];
 	int parallelismCondition = (depth < MAX_DEPTH)&&((right-left) > MIN_ARRAY_SIZE);
 #if (MEGA_PARALLEL == 1)
-  #pragma omp parallel shared(arr,pivot,left,right,i,j) private(tmp) \
+int parallelismCondition = (depth < MAX_DEPTH)&&((right-left) > MIN_ARRAY_SIZE);
+#pragma omp parallel shared(arr,pivot,left,right,i,j) private(tmp) \
   if(parallelismCondition)
   {
-	  //if(parallelismCondition) printf("Running Parallel\n");
     while (i <= j) {
-      #pragma omp barrier
-      #pragma omp sections
+#pragma omp barrier
+#pragma omp sections
       {
-        #pragma omp section
+#pragma omp section
         {
           while (arr[i] < pivot) i++;
         }
-        #pragma omp section
+#pragma omp section
         {
           while (arr[j] > pivot) j--;
         }
       }
-      #pragma omp single
+#pragma omp single
       {
         if (i <= j) {
           tmp = arr[i];
@@ -50,7 +48,7 @@ void quickSort(int arr[], int left, int right, int depth)
     }
 #pragma omp sections
     {
-      #pragma omp section
+#pragma omp section
       /* recursion */
       {
         if (left < j)
@@ -59,7 +57,7 @@ void quickSort(int arr[], int left, int right, int depth)
         }
 
       }
-      #pragma omp section
+#pragma omp section
       {
         if (i < right)
         {
@@ -86,9 +84,9 @@ void quickSort(int arr[], int left, int right, int depth)
 #pragma omp parallel shared(arr,pivot,left,right,i,j) private(tmp) \
   if(parallelismCondition)
     {
-    #pragma omp sections
+#pragma omp sections
     {
-      #pragma omp section
+#pragma omp section
       /* recursion */
       {
         if (left < j)
@@ -97,7 +95,7 @@ void quickSort(int arr[], int left, int right, int depth)
         }
 
       }
-      #pragma omp section
+#pragma omp section
       {
         if (i < right)
         {
@@ -114,23 +112,18 @@ int main(int argc, char* argv[]) {
   omp_set_nested(1);
   omp_set_num_threads(2);
 	srand ( (unsigned int)time(NULL) );
-
 //  printf("Array initial:\n");
 	for(i=0; i<N; i++) {
 		a[i] = rand()%1000;
 	//	printf("%d ",a[i]);
 	}
 	//printf("\n");
-	
   quickSort(a, 0, N-1, 0);
-
 	//printf("Array sortiert:\n");
 	for(i=0; i<N; i++) {
 	//	printf("%d ",a[i]);
 	}
-	
 	printf("\n");
-
 	return 0;
 
 }

@@ -12,7 +12,7 @@
 #define YSTEP 3.0/YSIZE
 #define XSTART -2.25
 #define YSTART -1.5
-#define PROCESS_COUNT 8
+//#define PROCESS_COUNT 8
 
 int image[WHOLE_SIZE];
 FILE *fd;

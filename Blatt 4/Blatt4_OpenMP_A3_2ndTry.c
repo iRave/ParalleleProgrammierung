@@ -15,6 +15,7 @@
 #include <time.h>
 #include <omp.h>
 #define N 100000000
+#define OMP_NUM_THREADS 10
 #define MAX_DEPTH OMP_NUM_THREADS-1
 #define MAX_DELTA 100
 

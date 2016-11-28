@@ -1,6 +1,6 @@
-//Bildpunkte sind unabhängig -> Datendekomposition der Punkte auf die Prozesse
+//Bildpunkte sind unabhaengig -> Datendekomposition der Punkte auf die Prozesse
 //Zeilenweise Datendekomposition (blockweise), Problem: ungleiche Verteilung
-//pixelweise zyklisch, Problem: aufwändigeres gathern(?)
+//pixelweise zyklisch, Problem: aufwaendigeres gathern(?)
 
 #include <stdio.h>
 #include <mpi.h>
@@ -79,14 +79,11 @@ int main(int argc, char **argv){
     MPI_Send(localBuffer, WHOLE_SIZE/PROCESS_COUNT, MPI_INT, 0, 0, MPI_COMM_WORLD);
   } else {
     MPI_Status status;
-
     merge(0, localBuffer);
-
     for(int process = 1; process < PROCESS_COUNT; process++) {
       MPI_Recv(localBuffer, WHOLE_SIZE/PROCESS_COUNT, MPI_INT, process, 0, MPI_COMM_WORLD, &status);
       merge(process, localBuffer);
     }
-
     fd=fopen("mandel.pgm","w");
     fprintf(fd, "P5 ");
     fprintf(fd, "%d %d ", YSIZE, XSIZE);

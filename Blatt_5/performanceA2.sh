@@ -30,6 +30,6 @@ do
  #   tail -n 4 out.txt
   done
   echo "Still alive 3"
-  (bc -l <<<"$avMultiTime/10.0/$avSingleTime") >> out.txt
+  (bc -l <<<"$avSingleTime/$avMultiTime/10.0") >> out.txt
   echo "still alive 4"
 done

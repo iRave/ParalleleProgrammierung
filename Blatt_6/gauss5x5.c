@@ -1,18 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
-#include <malloc.h>
 #include <sys/time.h>
-#include <omp.h>
+#include <string.h>
 
 #define SIZE 1024
 #define COUNT 1
 
 float Gauss5x5[5][5] = {{ 0.0005 , 0.005  , 0.011 , 0.005 , 0.0005 },
-                       { 0.005  , 0.052  , 0.115 , 0.052 , 0.005  },
-                       { 0.011  , 0.115  , 0.250 , 0.115 , 0.011  },
-                       { 0.005  , 0.052  , 0.115 , 0.052 , 0.005  },
-                       { 0.0005 , 0.005  , 0.011 , 0.005 , 0.0005 }};
+                        { 0.005  , 0.052  , 0.115 , 0.052 , 0.005  },
+                        { 0.011  , 0.115  , 0.250 , 0.115 , 0.011  },
+                        { 0.005  , 0.052  , 0.115 , 0.052 , 0.005  },
+                        { 0.0005 , 0.005  , 0.011 , 0.005 , 0.0005 }};
 
 float Image[SIZE][SIZE];
 float tmpImage[SIZE][SIZE];
@@ -23,9 +21,11 @@ void Filter(float Image[SIZE][SIZE], float Kernel[5][5]) {
     for(i=2;i<SIZE-2;i++) {
         for(j=2;j<SIZE-2;j++) {
             result = 0;
-            for(k=0;k<5;k++)
-                for(l=0;l<5;l++)
+            for(k=0;k<5;k++){
+                for(l=0;l<5;l++){
                     result += Kernel[k][l] * Image[i+k-2][j+l-2];
+                }
+            }
             tmpImage[i][j] = result;
         }
     }

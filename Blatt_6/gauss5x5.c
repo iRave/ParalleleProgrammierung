@@ -2,31 +2,49 @@
 #include <stdlib.h>
 #include <sys/time.h>
 #include <string.h>
+#include <immintrin.h>
 
 #define SIZE 1024
-#define COUNT 1
+#define INTRINSIC_COUNT 8
+#define COUNT 10
 
-float Gauss5x5[5][5] = {{ 0.0005 , 0.005  , 0.011 , 0.005 , 0.0005 },
-                        { 0.005  , 0.052  , 0.115 , 0.052 , 0.005  },
-                        { 0.011  , 0.115  , 0.250 , 0.115 , 0.011  },
-                        { 0.005  , 0.052  , 0.115 , 0.052 , 0.005  },
-                        { 0.0005 , 0.005  , 0.011 , 0.005 , 0.0005 }};
+const __attribute__((aligned(32)))float Gauss5x5[5][5] = {
+        { 0.0005 , 0.005  , 0.011 , 0.005 , 0.0005 },
+        { 0.005  , 0.052  , 0.115 , 0.052 , 0.005  },
+        { 0.011  , 0.115  , 0.250 , 0.115 , 0.011  },
+        { 0.005  , 0.052  , 0.115 , 0.052 , 0.005  },
+        { 0.0005 , 0.005  , 0.011 , 0.005 , 0.0005 }};
 
 float Image[SIZE][SIZE];
-float tmpImage[SIZE][SIZE];
 
-void Filter(float Image[SIZE][SIZE], float Kernel[5][5]) {
+
+void Filter(float Image[SIZE][SIZE], const float Kernel[5][5]) {
+    float tmpImage[SIZE][SIZE];
+    float helpArray[INTRINSIC_COUNT];
     int i,j,k,l,b,h;
-    float result;
+    __m256 kernelVec, envRow, resultRow, summ;
+    __attribute__((aligned(32)))float result[INTRINSIC_COUNT];
+    for(k=0;k<5;k++) {
+        for (l = 0; l < 5; l++) {
+            for (int m = 0; m < INTRINSIC_COUNT; ++m) {
+                helpArray[m] = Kernel[k][l];
+            }
+        }
+    }
+
     for(i=2;i<SIZE-2;i++) {
-        for(j=2;j<SIZE-2;j++) {
-            result = 0;
+        for(j=2;j<SIZE-2;j+=8) {
+            memset(result, 0, INTRINSIC_COUNT);
+            summ = _mm256_load_ps(result);
             for(k=0;k<5;k++){
                 for(l=0;l<5;l++){
-                    result += Kernel[k][l] * Image[i+k-2][j+l-2];
+                    kernelVec = _mm256_load_ps(helpArray);
+                    envRow = _mm256_loadu_ps(&Image[i+k-2][j+l-2]);
+                    resultRow = _mm256_mul_ps(kernelVec,envRow);
+                    summ = _mm256_add_ps(summ, resultRow);
                 }
             }
-            tmpImage[i][j] = result;
+            _mm256_storeu_ps(&tmpImage[i][j],summ);
         }
     }
     for(h=2;h<SIZE-2;h++) {

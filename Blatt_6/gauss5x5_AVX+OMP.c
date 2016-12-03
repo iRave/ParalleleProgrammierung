@@ -32,7 +32,7 @@ const __attribute__((aligned(32)))float Gauss5x5[5][5] = {
 
 float Image[SIZE][SIZE];
 
-void Filter(float Image[SIZE][SIZE], const float Kernel[5][5]) {
+void Filter(float Image[SIZE][SIZE], const float Kernel[5][5], int runCount) {
     float tmpImage[SIZE][SIZE];
     __attribute__((aligned(32))) float helpArray[5][5][INTRINSIC_COUNT];
     int i,j,k,l,b,h;
@@ -40,7 +40,8 @@ void Filter(float Image[SIZE][SIZE], const float Kernel[5][5]) {
     __attribute__((aligned(32)))float result[INTRINSIC_COUNT];
 
 #pragma omp parallel shared(helpArray, Image)
-    LOG("Threadcount: %i\n", omp_get_num_threads());
+    if (omp_get_thread_num() == 1 && runCount == 0)
+        LOG("Threadcount: %i\n", omp_get_num_threads());
 #pragma omp for
     for(k = 0; k < 5; k++) {
       for (l = 0; l < 5; l++) {
@@ -125,7 +126,7 @@ int main(int argc, char* argv[]) {
     for (int j = 0; j < RUN_COUNT; ++j) {
         t1 = getTime();
         for (i=0; i<FILTER_COUNT; i++) {
-            Filter(Image, Gauss5x5);
+            Filter(Image, Gauss5x5, j+i);
         }
         t2 = getTime();
         times += (t2 - t1) / FILTER_COUNT;

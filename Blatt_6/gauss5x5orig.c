@@ -4,7 +4,9 @@
 #include <memory.h>
 
 #define SIZE 1024
+#ifndef FILTER_COUNT
 #define FILTER_COUNT 10
+#endif
 
 #ifndef RUN_COUNT
 #define RUN_COUNT 5

@@ -12,7 +12,7 @@
 #endif
 
 #ifndef RUN_COUNT
-#define RUN_COUNT 20
+#define RUN_COUNT 5
 #endif
 
 const __attribute__((aligned(32)))float Gauss5x5[5][5] = {

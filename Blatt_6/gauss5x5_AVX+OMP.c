@@ -14,7 +14,7 @@
 #endif
 
 #ifndef RUN_COUNT
-#define RUN_COUNT 20
+#define RUN_COUNT 5
 #endif
 
 #ifndef THREAD_COUNT
@@ -39,28 +39,26 @@ float Image[SIZE][SIZE];
 void Filter(float Image[SIZE][SIZE], const float Kernel[5][5], int runCount) {
     float tmpImage[SIZE][SIZE];
     __attribute__((aligned(32))) float helpArray[5][5][INTRINSIC_COUNT];
-    int i,j,k,l,b,h;
     __m256 kernelVec, envRow, resultRow, summ;
     __attribute__((aligned(32)))float result[INTRINSIC_COUNT];
-    omp_set_num_threads(THREAD_COUNT);
-#pragma omp parallel shared(helpArray, Image) private(kernelVec, envRow, resultRow, summ)
+#pragma omp parallel shared(helpArray, Image, Kernel) private(kernelVec, envRow, resultRow, summ) num_threads(THREAD_COUNT)
     if (omp_get_thread_num() == 1 && runCount == 0)
         LOG("Threadcount: %i\n", omp_get_num_threads());
-#pragma omp for private(k,l)
-    for(k = 0; k < 5; k++) {
-      for (l = 0; l < 5; l++) {
+#pragma omp for
+    for(int k = 0; k < 5; k++) {
+      for (int l = 0; l < 5; l++) {
           for (int m = 0; m < INTRINSIC_COUNT; m++) {
               helpArray[k][l][m] = Kernel[k][l];
           }
       }
     }
-#pragma omp for private(i,j,k,l)
-    for(i=2;i<SIZE-2;i++) {
-        for(j=2;j<SIZE-2;j+=8) {
+#pragma omp for
+    for(int i=2;i<SIZE-2;i++) {
+        for(int j=2;j<SIZE-2;j+=8) {
             memset(result, 0, INTRINSIC_COUNT);
             summ = _mm256_load_ps(result);
-            for(k=0;k<5;k++){
-                for(l=0;l<5;l++){
+            for(int k=0;k<5;k++){
+                for(int l=0;l<5;l++){
                     kernelVec = _mm256_load_ps(&helpArray[k][l][0]);
                     envRow = _mm256_loadu_ps(&Image[i+k-2][j+l-2]);
                     resultRow = _mm256_mul_ps(kernelVec,envRow);
@@ -70,9 +68,9 @@ void Filter(float Image[SIZE][SIZE], const float Kernel[5][5], int runCount) {
             _mm256_storeu_ps(&tmpImage[i][j],summ);
         }
     }
-#pragma omp for private(h,b)
-    for(h=2;h<SIZE-2;h++) {
-        for(b=2;b<SIZE-2;b++)
+#pragma omp for
+    for(int h=2;h<SIZE-2;h++) {
+        for(int b=2;b<SIZE-2;b++)
             Image[h][b] = tmpImage[h][b];
     }
 }

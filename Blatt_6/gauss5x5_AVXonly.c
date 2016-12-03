@@ -121,5 +121,5 @@ int main(int argc, char* argv[]) {
     times = times / RUN_COUNT;
     WriteImage(Image, "lena_out.pgm");
     printf("result saved in lena_out.pgm\n");
-    printf("Ran Algorithm %i time(s), filtering the image %i time(s) each.\nAverage execution time: %f ms\n", RUN_COUNT, FILTER_COUNT, times);
+    printf("Ran Algorithm with AVX only %i time(s), filtering the image %i time(s) each.\nAverage execution time: %f ms\n", RUN_COUNT, FILTER_COUNT, times);
 }

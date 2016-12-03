@@ -3,6 +3,8 @@
 #include <sys/time.h>
 #include <string.h>
 #include <immintrin.h>
+#include <omp.h>
+
 
 #define SIZE 1024
 #define INTRINSIC_COUNT 8
@@ -15,6 +17,12 @@
 #define RUN_COUNT 20
 #endif
 
+//#define DEBUG
+#ifdef DEBUG
+#define LOG(...) printf(__VA_ARGS__)
+#else
+#define LOG(...)
+#endif
 const __attribute__((aligned(32)))float Gauss5x5[5][5] = {
         { 0.0005 , 0.005  , 0.011 , 0.005 , 0.0005 },
         { 0.005  , 0.052  , 0.115 , 0.052 , 0.005  },
@@ -31,6 +39,9 @@ void Filter(float Image[SIZE][SIZE], const float Kernel[5][5]) {
     __m256 kernelVec, envRow, resultRow, summ;
     __attribute__((aligned(32)))float result[INTRINSIC_COUNT];
 
+#pragma omp parallel shared(helpArray, Image)
+    LOG("Threadcount: %i\n", omp_get_num_threads());
+#pragma omp for
     for(k = 0; k < 5; k++) {
       for (l = 0; l < 5; l++) {
           for (int m = 0; m < INTRINSIC_COUNT; m++) {
@@ -38,7 +49,7 @@ void Filter(float Image[SIZE][SIZE], const float Kernel[5][5]) {
           }
       }
     }
-
+#pragma omp for
     for(i=2;i<SIZE-2;i++) {
         for(j=2;j<SIZE-2;j+=8) {
             memset(result, 0, INTRINSIC_COUNT);
@@ -54,6 +65,7 @@ void Filter(float Image[SIZE][SIZE], const float Kernel[5][5]) {
             _mm256_storeu_ps(&tmpImage[i][j],summ);
         }
     }
+#pragma omp for
     for(h=2;h<SIZE-2;h++) {
         for(b=2;b<SIZE-2;b++)
             Image[h][b] = tmpImage[h][b];
@@ -121,5 +133,5 @@ int main(int argc, char* argv[]) {
     times = times / RUN_COUNT;
     WriteImage(Image, "lena_out.pgm");
     printf("result saved in lena_out.pgm\n");
-    printf("Ran Algorithm %i time(s), filtering the image %i time(s) each.\nAverage execution time: %f ms\n", RUN_COUNT, FILTER_COUNT, times);
+    printf("Ran Algorithm with AVX+OMP %i time(s), filtering the image %i time(s) each.\nAverage execution time: %f ms\n", RUN_COUNT, FILTER_COUNT, times);
 }

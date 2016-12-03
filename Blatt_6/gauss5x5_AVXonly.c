@@ -107,10 +107,8 @@ int main(int argc, char* argv[]) {
     int i;
     double t1=0,t2=0;
     double times = 0;
-
-    ReadImage("lena.pgm",Image);
-
     for (int j = 0; j < RUN_COUNT; ++j) {
+        ReadImage("lena.pgm",Image);
         t1 = getTime();
         for (i=0; i<FILTER_COUNT; i++) {
             Filter(Image, Gauss5x5);

@@ -6,7 +6,7 @@
 
 #define SIZE 1024
 #define INTRINSIC_COUNT 8
-#define COUNT 10
+#define COUNT 1
 
 const __attribute__((aligned(32)))float Gauss5x5[5][5] = {
         { 0.0005 , 0.005  , 0.011 , 0.005 , 0.0005 },
@@ -20,26 +20,31 @@ float Image[SIZE][SIZE];
 
 void Filter(float Image[SIZE][SIZE], const float Kernel[5][5]) {
     float tmpImage[SIZE][SIZE];
-    float helpArray[5][5][INTRINSIC_COUNT];
+    __attribute__((aligned(32))) float helpArray[5][5][INTRINSIC_COUNT];
     int i,j,k,l,b,h;
     __m256 kernelVec, envRow, resultRow, summ;
     __attribute__((aligned(32)))float result[INTRINSIC_COUNT];
 
     for(k = 0; k < 5; k++) {
         for (l = 0; l < 5; l++) {
-            for (int m = 0; m < INTRINSIC_COUNT; ++m) {
+            for (int m = 0; m < INTRINSIC_COUNT; m++) {
                 helpArray[k][l][m] = Kernel[k][l];
             }
         }
     }
 
     for(i=2;i<SIZE-2;i++) {
+    //  printf("i=%d\n",i);
         for(j=2;j<SIZE-2;j+=8) {
+        //  printf("\tj=%d\n",j);
             memset(result, 0, INTRINSIC_COUNT);
             summ = _mm256_load_ps(result);
             for(k=0;k<5;k++){
+      //        printf("\t\tk=%d\n",k);
                 for(l=0;l<5;l++){
-                    kernelVec = _mm256_load_ps(helpArray[k][l]);
+        //          printf("\t\t\tl=%d\n",l);
+                    kernelVec = _mm256_load_ps(&helpArray[k][l][0]);
+          //          printf("mooh\n");
                     envRow = _mm256_loadu_ps(&Image[i+k-2][j+l-2]);
                     resultRow = _mm256_mul_ps(kernelVec,envRow);
                     summ = _mm256_add_ps(summ, resultRow);

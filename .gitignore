@@ -1,9 +1,14 @@
 # GCC output files
 *.o
 
+#CMake Dir
+cmake-build-debug
+
 # LateX
 *.pdf
 *.log
 *.aux
 *.gz
 *.dvi
+*.fls
+*.fdb_latexmk

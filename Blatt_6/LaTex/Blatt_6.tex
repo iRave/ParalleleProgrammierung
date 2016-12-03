@@ -1,0 +1,46 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[ngerman]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage [autostyle]{csquotes}
+\MakeOuterQuote{"}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{color}
+\usepackage{xcolor}
+\colorlet{keywordstylecolor}{green!40!black}
+\colorlet{commentstyle}{purple!40!black}
+\usepackage{listings}
+\lstdefinestyle{customc}{
+  belowcaptionskip=1\baselineskip,
+  breaklines=true,
+  frame=L,
+  xleftmargin=\parindent,
+  language=C,
+  showstringspaces=false,
+  basicstyle=\footnotesize\ttfamily,
+  keywordstyle=\bfseries\color{keywordstylecolor},
+  commentstyle=\itshape\color{commentstyle},
+  identifierstyle=\color{blue},
+  stringstyle=\color{orange},
+  numbers=left,
+  stepnumber=5,
+  numberfirstline=false,
+  tabsize=2,
+  breaklines=true,
+  prebreak=\small\symbol{'134}
+}
+\usepackage{siunitx}
+\author{Till Busse, Florian Ölsner}
+\title{Parallele Programmierung Blatt 6}
+\begin{document}
+\maketitle
+\pagebreak
+\section{Bildverarbeitung mit Intel AVX}
+\subsection{Faltung mit Intel AVX - Vorüberlegung}
+Bei der Faltung eines einzigen Pixels mit einer 5x5-Matrix werden 25 voneinander Produkte berechnet und anschließend addiert. Da die Multiplikationen voneinander unabhängig sind, können sie Datenparallel ausgeführt werden. Der Nachteil dabei ist, dass z.B. bei einer Implementierung mit AVX und 32-Bit-Float-Pixeln nur maximal 8 Multiplikationen gleichzeitig ausgeführt werden können. Das bedeutet, dass bei insgesamt 25 Produkten die Parallelität nicht ganz ausgenutzt werden kann. Zieht man jedoch in betracht, dass sämtliche Pixel eines gesamten Bildes gefaltet werden, ergibt sich noch eine weitere Möglichkeit der Parallelisierung. In diesem Fall kann die Faltungssumme für mehrere Pixel gleichzeitig berechnet werden. Dies hat den Vorteil, dass die Parallelität besser ausgenutzt wird, zumal auch die Additionen parallelisiert werden können. Allerdings gibt es Probleme, wenn die Anzahl der Pixel pro Reihe -4 nicht durch den Parallelitätsgrad teilbar ist.
+\subsection{Faltung mit Intel AVX - Implementierung}
+Bei der Implementierung haben wir uns für die zweite Version entschieden, bei der die Faltung für 256/32=8 Pixel parallel berechnet wird. Dazu ist es erforderlich, die Werte der Gauss-Matrix jeweils so in ein 256-Bit Array zu kopieren, sodass sie darin 8 mal hintereinander stehen.
+\lstinputlisting[firstline=0,language=c,escapechar=@,style=customc,caption=Programmcode]{../gauss5x5_AVXonly.c}
+\end{document}

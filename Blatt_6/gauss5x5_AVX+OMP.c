@@ -43,7 +43,7 @@ void Filter(float Image[SIZE][SIZE], const float Kernel[5][5], int runCount) {
     __m256 kernelVec, envRow, resultRow, summ;
     __attribute__((aligned(32)))float result[INTRINSIC_COUNT];
     omp_set_num_threads(THREAD_COUNT);
-#pragma omp parallel shared(helpArray, Image)
+#pragma omp parallel shared(helpArray, Image) private(kernelVec, envRow, resultRow, summ)
     if (omp_get_thread_num() == 1 && runCount == 0)
         LOG("Threadcount: %i\n", omp_get_num_threads());
 #pragma omp for private(k,l)

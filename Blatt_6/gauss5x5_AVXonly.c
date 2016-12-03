@@ -6,7 +6,14 @@
 
 #define SIZE 1024
 #define INTRINSIC_COUNT 8
-#define COUNT 100
+
+#ifndef FILTER_COUNT
+#define FILTER_COUNT 10
+#endif
+
+#ifndef RUN_COUNT
+#define RUN_COUNT 20
+#endif
 
 const __attribute__((aligned(32)))float Gauss5x5[5][5] = {
         { 0.0005 , 0.005  , 0.011 , 0.005 , 0.0005 },
@@ -99,13 +106,20 @@ double getTime(){  /* elapsed time in ms */
 int main(int argc, char* argv[]) {
     int i;
     double t1=0,t2=0;
+    double times = 0;
 
     ReadImage("lena.pgm",Image);
-    t1 = getTime();
-    for (i=0; i<COUNT; i++)
-        Filter(Image,Gauss5x5);
-    t2 = getTime();
+
+    for (int j = 0; j < RUN_COUNT; ++j) {
+        t1 = getTime();
+        for (i=0; i<FILTER_COUNT; i++) {
+            Filter(Image, Gauss5x5);
+        }
+        t2 = getTime();
+        times += (t2 - t1) / FILTER_COUNT;
+    }
+    times = times / RUN_COUNT;
     WriteImage(Image, "lena_out.pgm");
     printf("result saved in lena_out.pgm\n");
-    printf("Elapsed time: %f ms\n",(t2-t1)/COUNT);
+    printf("Ran Algorithm %i time(s), filtering the image %i time(s) each.\nAverage execution time: %f ms\n", RUN_COUNT, FILTER_COUNT, times);
 }

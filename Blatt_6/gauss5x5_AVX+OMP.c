@@ -17,6 +17,10 @@
 #define RUN_COUNT 20
 #endif
 
+#ifndef THREAD_COUNT
+#define THREAD_COUNT 8
+#endif
+
 //#define DEBUG
 #ifdef DEBUG
 #define LOG(...) printf(__VA_ARGS__)
@@ -38,11 +42,11 @@ void Filter(float Image[SIZE][SIZE], const float Kernel[5][5], int runCount) {
     int i,j,k,l,b,h;
     __m256 kernelVec, envRow, resultRow, summ;
     __attribute__((aligned(32)))float result[INTRINSIC_COUNT];
-
+    omp_set_num_threads(THREAD_COUNT);
 #pragma omp parallel shared(helpArray, Image)
     if (omp_get_thread_num() == 1 && runCount == 0)
         LOG("Threadcount: %i\n", omp_get_num_threads());
-#pragma omp for
+#pragma omp for private(k,l)
     for(k = 0; k < 5; k++) {
       for (l = 0; l < 5; l++) {
           for (int m = 0; m < INTRINSIC_COUNT; m++) {
@@ -50,7 +54,7 @@ void Filter(float Image[SIZE][SIZE], const float Kernel[5][5], int runCount) {
           }
       }
     }
-#pragma omp for
+#pragma omp for private(i,j,k,l)
     for(i=2;i<SIZE-2;i++) {
         for(j=2;j<SIZE-2;j+=8) {
             memset(result, 0, INTRINSIC_COUNT);
@@ -66,7 +70,7 @@ void Filter(float Image[SIZE][SIZE], const float Kernel[5][5], int runCount) {
             _mm256_storeu_ps(&tmpImage[i][j],summ);
         }
     }
-#pragma omp for
+#pragma omp for private(h,b)
     for(h=2;h<SIZE-2;h++) {
         for(b=2;b<SIZE-2;b++)
             Image[h][b] = tmpImage[h][b];

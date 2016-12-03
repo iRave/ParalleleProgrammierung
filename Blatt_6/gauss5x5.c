@@ -17,7 +17,6 @@ const __attribute__((aligned(32)))float Gauss5x5[5][5] = {
 
 float Image[SIZE][SIZE];
 
-
 void Filter(float Image[SIZE][SIZE], const float Kernel[5][5]) {
     float tmpImage[SIZE][SIZE];
     __attribute__((aligned(32))) float helpArray[5][5][INTRINSIC_COUNT];
@@ -26,11 +25,11 @@ void Filter(float Image[SIZE][SIZE], const float Kernel[5][5]) {
     __attribute__((aligned(32)))float result[INTRINSIC_COUNT];
 
     for(k = 0; k < 5; k++) {
-        for (l = 0; l < 5; l++) {
-            for (int m = 0; m < INTRINSIC_COUNT; m++) {
-                helpArray[k][l][m] = Kernel[k][l];
-            }
-        }
+      for (l = 0; l < 5; l++) {
+          for (int m = 0; m < INTRINSIC_COUNT; m++) {
+              helpArray[k][l][m] = Kernel[k][l];
+          }
+      }
     }
 
     for(i=2;i<SIZE-2;i++) {
@@ -55,25 +54,25 @@ void Filter(float Image[SIZE][SIZE], const float Kernel[5][5]) {
 }
 
 void WriteImage(float Image[SIZE][SIZE], char* file) {
-	int i,j;
-	FILE* fd = fopen(file, "w+b");
-	fprintf(fd, "P5 ");
+    int i,j;
+    FILE* fd = fopen(file, "w+b");
+    fprintf(fd, "P5 ");
     fprintf(fd, "%d %d ", SIZE, SIZE);
     fprintf(fd, "%d ", 255);   /* Max. Grauwert */
-	for(i=0;i<SIZE;i++) {
-      for(j=0;j<SIZE;j++)
-        fprintf(fd,"%c",(unsigned char) Image[i][j]);
-	}
-	fclose(fd);
+    for(i=0;i<SIZE;i++) {
+        for(j=0;j<SIZE;j++)
+            fprintf(fd,"%c",(unsigned char) Image[i][j]);
+    }
+    fclose(fd);
 }
 
 
 void ReadImage(char* file, float Image[SIZE][SIZE]) {
     int i,j;
-	char version[3];
-	int zeilen, spalten, maxgrauwert;
+    char version[3];
+    int zeilen, spalten, maxgrauwert;
     FILE* fd = fopen(file, "rb");
-	fgets(version, sizeof(version), fd);
+    fgets(version, sizeof(version), fd);
     if (strcmp(version, "P5")) {
         fprintf(stderr, "Wrong file type!\n");
         exit(EXIT_FAILURE);
@@ -84,29 +83,29 @@ void ReadImage(char* file, float Image[SIZE][SIZE]) {
     fgetc(fd);
     for(i=0;i<SIZE;i++) {
         for(j=0;j<SIZE;j++) {
-           Image[i][j] = (float)fgetc(fd);
+            Image[i][j] = (float)fgetc(fd);
         }
     }
     fclose(fd);
 }
 
 double getTime(){  /* elapsed time in ms */
-  struct timeval curr;
-  gettimeofday(&curr, NULL);
-  double tmp = (double)curr.tv_sec * 1000.0 + (double)curr.tv_usec/1000.0;
-  return tmp;
+    struct timeval curr;
+    gettimeofday(&curr, NULL);
+    double tmp = (double)curr.tv_sec * 1000.0 + (double)curr.tv_usec/1000.0;
+    return tmp;
 }
 
 int main(int argc, char* argv[]) {
     int i;
-	double t1=0,t2=0;
+    double t1=0,t2=0;
 
-	ReadImage("lena.pgm",Image);
-	t1 = getTime();
-	for (i=0; i<COUNT; i++)
-	   Filter(Image,Gauss5x5);
-	t2 = getTime();
-	WriteImage(Image, "lena_out.pgm");
+    ReadImage("lena.pgm",Image);
+    t1 = getTime();
+    for (i=0; i<COUNT; i++)
+        Filter(Image,Gauss5x5);
+    t2 = getTime();
+    WriteImage(Image, "lena_out.pgm");
     printf("result saved in lena_out.pgm\n");
     printf("Elapsed time: %f ms\n",(t2-t1)/COUNT);
 }

@@ -43,4 +43,9 @@ Bei der Faltung eines einzigen Pixels mit einer 5x5-Matrix werden 25 voneinander
 \subsection{Faltung mit Intel AVX - Implementierung}
 Bei der Implementierung haben wir uns für die zweite Version entschieden, bei der die Faltung für 256/32=8 Pixel parallel berechnet wird. Dazu ist es erforderlich, die Werte der Gauss-Matrix jeweils so in ein 256-Bit Array zu kopieren, sodass sie darin 8 mal hintereinander stehen.
 \lstinputlisting[firstline=0,language=c,escapechar=@,style=customc,caption=Programmcode]{../gauss5x5_AVXonly.c}
+\subsection{Speedup auf mit Hilfe von Intel-AVX}
+
+\subsection{Daten- + Threadprallel mit OpenMP}
+\lstinputlisting[firstline=0,language=c,escapechar=@,style=customc,caption=Programmcode]{../gauss5x5_AVX+OMP.c}
+ö
 \end{document}

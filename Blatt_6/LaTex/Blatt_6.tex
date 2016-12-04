@@ -7,10 +7,12 @@
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{amssymb}
+\usepackage{subcaption}
 \usepackage{color}
-\usepackage{xcolor}
+\usepackage[dvipsnames, listings]{xcolor}
 \colorlet{keywordstylecolor}{green!40!black}
 \colorlet{commentstyle}{purple!40!black}
+\usepackage{graphicx}
 \usepackage{listings}
 \lstdefinestyle{customc}{
   belowcaptionskip=1\baselineskip,
@@ -31,6 +33,20 @@
   breaklines=true,
   prebreak=\small\symbol{'134}
 }
+\lstdefinestyle{Bash}
+{
+  language=Bash,
+  backgroundcolor=\color{Gray},
+  keywordstyle=\color{BlueViolet}\bfseries,
+  commentstyle=\color{Grey},
+  stringstyle=\color{Red},
+  showstringspaces=false,
+  basicstyle=\small\color{white},
+  numbers=none,
+  captionpos=b,
+  tabsize=4,
+  breaklines=true
+}
 \usepackage{siunitx}
 \author{Till Busse, Florian Ölsner}
 \title{Parallele Programmierung Blatt 6}
@@ -39,12 +55,33 @@
 \pagebreak
 \section{Bildverarbeitung mit Intel AVX}
 \subsection{Faltung mit Intel AVX - Vorüberlegung}
-Bei der Faltung eines einzigen Pixels mit einer 5x5-Matrix werden 25 voneinander Produkte berechnet und anschließend addiert. Da die Multiplikationen voneinander unabhängig sind, können sie Datenparallel ausgeführt werden. Der Nachteil dabei ist, dass z.B. bei einer Implementierung mit AVX und 32-Bit-Float-Pixeln nur maximal 8 Multiplikationen gleichzeitig ausgeführt werden können. Das bedeutet, dass bei insgesamt 25 Produkten die Parallelität nicht ganz ausgenutzt werden kann. Zieht man jedoch in betracht, dass sämtliche Pixel eines gesamten Bildes gefaltet werden, ergibt sich noch eine weitere Möglichkeit der Parallelisierung. In diesem Fall kann die Faltungssumme für mehrere Pixel gleichzeitig berechnet werden. Dies hat den Vorteil, dass die Parallelität besser ausgenutzt wird, zumal auch die Additionen parallelisiert werden können. Allerdings gibt es Probleme, wenn die Anzahl der Pixel pro Reihe -4 nicht durch den Parallelitätsgrad teilbar ist.
+Bei der Faltung eines einzigen Pixels mit einer 5x5-Matrix werden 25 voneinander Produkte berechnet und anschließend addiert. Da die Multiplikationen voneinander unabhängig sind, können sie Datenparallel ausgeführt werden. Der Nachteil dabei ist, dass z.B. bei einer Implementierung mit AVX und 32-Bit-Float-Pixeln nur maximal 8 Multiplikationen gleichzeitig ausgeführt werden können. Das bedeutet, dass bei insgesamt 25 Produkten die Parallelität nicht ganz ausgenutzt werden kann. Zieht man jedoch in betracht, dass sämtliche Pixel eines gesamten Bildes gefaltet werden, ergibt sich noch eine weitere Möglichkeit der Parallelisierung. In diesem Fall kann die Faltungssumme für mehrere Pixel gleichzeitig berechnet werden. Dies hat den Vorteil, dass die Parallelität besser ausgenutzt wird, zumal auch die Additionen parallelisiert werden können. Allerdings gibt es Probleme, wenn die "Anzahl der Pixel pro Reihe -4" nicht durch den Parallelitätsgrad teilbar ist.
 \subsection{Faltung mit Intel AVX - Implementierung}
 Bei der Implementierung haben wir uns für die zweite Version entschieden, bei der die Faltung für 256/32=8 Pixel parallel berechnet wird. Dazu ist es erforderlich, die Werte der Gauss-Matrix jeweils so in ein 256-Bit Array zu kopieren, sodass sie darin 8 mal hintereinander stehen.
-\lstinputlisting[firstline=0,language=c,escapechar=@,style=customc,caption=Programmcode]{../gauss5x5_AVXonly.c}
+\lstinputlisting[firstline=27,lastline=61,language=c,escapechar=@,style=customc,caption=Programmcode]{../gauss5x5_AVXonly.c}
+\subsection{Test des Programms}
+
+\begin{figure}[h]
+  \begin{subfigure}{0.5\textwidth}
+    \includegraphics[width=0.9\linewidth, height=5cm]{../lena.jpg}
+    \caption{Original Bild}
+    \label{fig:subim2}
+  \end{subfigure}
+  \begin{subfigure}{0.5\textwidth}
+    \includegraphics[width=0.9\linewidth, height=5cm]{../lenaout.jpg}
+    \caption{Bearbeitetes Bild}
+    \label{fig:subim1}
+  \end{subfigure}
+  \caption{Lena}
+  \label{fig:image2}
+\end{figure}
+
 \subsection{Speedup auf mit Hilfe von Intel-AVX}
 Die durchschnittliche Ausführungszeit des originalen Algorithmus für 30 Wiederholungen liegt bei 110.510416 ms. Mit Hilfe der AVX-Intrinsics konnte dieser Wert auf 39.010390 ms verringert werden. Dies entspricht einem Speedup von 2.8328457111.
-\subsection{Daten- + Threadprallel mit OpenMP}
-\lstinputlisting[firstline=0,language=c,escapechar=@,style=customc,caption=Programmcode]{../gauss5x5_AVX+OMP.c}
+\subsection{Daten- \& Threadprallel mit OpenMP}
+Das Programm konnte mit OpenMP zusätzlich beschleunigt werden, indem das Bild zeilenweise auf mehrere Threads aufgeteilt wird. Zeilen sind den Spalten vorzuziehen, da es durch die Datenparallelisierung acht mal mehr Zeilen als Spalten sind. Die Spalten könnten zwar ebenfalls auf verschiedene Threads verteilt werden, jedoch ist der Overhead dafür vermutlich zu groß. Die 24 bzw. 48 Kerne sollten bereits mit den 1020 Zeilen gut ausgelastet sein. Mit dieser Version dauert die Faltung auf dem Server im Durchschnitt 18.12 ms bei 128 Threads, was einen Speedup von 6.09 gegenüber dem originalen Algorithmus ergibt. Gegenüber der Implemtierung mit AVX beträgt der Speedup 2.15.
+\subsubsection{Implementierung}
+\lstinputlisting[firstline=39,lastline=79,language=c,escapechar=@,style=customc,caption=Programmcode]{../gauss5x5_AVX+OMP.c}
+\subsubsection{Zeitmessung}
+\lstinputlisting[firstline=0,language=Bash,style=customc,escapechar=@,caption=Bash output]{../out.txt}
 \end{document}

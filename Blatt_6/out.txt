@@ -1,0 +1,48 @@
+threadCount = 1
+result saved in lena_out.pgm
+Ran Algorithm with AVX+OMP 30 time(s), filtering the image 10 time(s) each.
+Average execution time: 41.254434 ms
+threadCount = 2
+result saved in lena_out.pgm
+Ran Algorithm with AVX+OMP 30 time(s), filtering the image 10 time(s) each.
+Average execution time: 33.956737 ms
+threadCount = 4
+result saved in lena_out.pgm
+Ran Algorithm with AVX+OMP 30 time(s), filtering the image 10 time(s) each.
+Average execution time: 31.226452 ms
+threadCount = 8
+result saved in lena_out.pgm
+Ran Algorithm with AVX+OMP 30 time(s), filtering the image 10 time(s) each.
+Average execution time: 25.393350 ms
+threadCount = 16
+result saved in lena_out.pgm
+Ran Algorithm with AVX+OMP 30 time(s), filtering the image 10 time(s) each.
+Average execution time: 27.906007 ms
+threadCount = 32
+result saved in lena_out.pgm
+Ran Algorithm with AVX+OMP 30 time(s), filtering the image 10 time(s) each.
+Average execution time: 21.091991 ms
+threadCount = 64
+result saved in lena_out.pgm
+Ran Algorithm with AVX+OMP 30 time(s), filtering the image 10 time(s) each.
+Average execution time: 15.920882 ms
+threadCount = 128
+result saved in lena_out.pgm
+Ran Algorithm with AVX+OMP 30 time(s), filtering the image 10 time(s) each.
+Average execution time: 18.121879 ms
+threadCount = 256
+result saved in lena_out.pgm
+Ran Algorithm with AVX+OMP 30 time(s), filtering the image 10 time(s) each.
+Average execution time: 18.234665 ms
+threadCount = 512
+result saved in lena_out.pgm
+Ran Algorithm with AVX+OMP 30 time(s), filtering the image 10 time(s) each.
+Average execution time: 21.538604 ms
+threadCount = 1024
+result saved in lena_out.pgm
+Ran Algorithm with AVX+OMP 30 time(s), filtering the image 10 time(s) each.
+Average execution time: 24.022308 ms
+threadCount = 2048
+result saved in lena_out.pgm
+Ran Algorithm with AVX+OMP 30 time(s), filtering the image 10 time(s) each.
+Average execution time: 46.262327 ms

@@ -77,9 +77,9 @@ Bei der Implementierung haben wir uns für die zweite Version entschieden, bei d
 \end{figure}
 
 \subsection{Speedup auf mit Hilfe von Intel-AVX}
-Die durchschnittliche Ausführungszeit des originalen Algorithmus für 30 Wiederholungen liegt bei 110.510416 ms. Mit Hilfe der AVX-Intrinsics konnte dieser Wert auf 39.010390 ms verringert werden. Dies entspricht einem Speedup von 2.8328457111.
+Die durchschnittliche Ausführungszeit des originalen Algorithmus für 30 Wiederholungen liegt bei 110.51 ms. Mit Hilfe der AVX-Intrinsics konnte dieser Wert auf 39.01 ms verringert werden. Dies entspricht einem Speedup von 2.8328457111.
 \subsection{Daten- \& Threadprallel mit OpenMP}
-Das Programm konnte mit OpenMP zusätzlich beschleunigt werden, indem das Bild zeilenweise auf mehrere Threads aufgeteilt wird. Zeilen sind den Spalten vorzuziehen, da es durch die Datenparallelisierung acht mal mehr Zeilen als Spalten sind. Die Spalten könnten zwar ebenfalls auf verschiedene Threads verteilt werden, jedoch ist der Overhead dafür vermutlich zu groß. Die 24 bzw. 48 Kerne sollten bereits mit den 1020 Zeilen gut ausgelastet sein. Mit dieser Version dauert die Faltung auf dem Server im Durchschnitt 18.12 ms bei 128 Threads, was einen Speedup von 6.09 gegenüber dem originalen Algorithmus ergibt. Gegenüber der Implemtierung mit AVX beträgt der Speedup 2.15.
+Das Programm konnte mit OpenMP zusätzlich beschleunigt werden, indem das Bild zeilenweise auf mehrere Threads aufgeteilt wird. Zeilen sind den Spalten vorzuziehen, da es durch die Datenparallelisierung acht mal mehr Zeilen als Spalten sind. Die Spalten könnten zwar ebenfalls auf verschiedene Threads verteilt werden, jedoch ist der Overhead dafür vermutlich zu groß. Die 24 bzw. 48 Kerne sollten bereits mit den 1020 Zeilen gut ausgelastet sein. Mit dieser Version dauert die Faltung auf dem Server im Durchschnitt 15.92 ms bei 64 Threads, was einen Speedup von 6,94 gegenüber dem originalen Algorithmus ergibt. Gegenüber der Implemtierung mit AVX beträgt der Speedup 2.45.
 \subsubsection{Implementierung}
 \lstinputlisting[firstline=39,lastline=79,language=c,escapechar=@,style=customc,caption=Programmcode]{../gauss5x5_AVX+OMP.c}
 \subsubsection{Zeitmessung}

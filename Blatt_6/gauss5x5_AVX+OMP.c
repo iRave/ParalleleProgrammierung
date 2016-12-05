@@ -40,7 +40,7 @@ void Filter(float Image[SIZE][SIZE], const float Kernel[5][5], int runCount) {
     float tmpImage[SIZE][SIZE];
     __attribute__((aligned(32))) float helpArray[5][5][INTRINSIC_COUNT];
     __m256 kernelVec, envRow, resultRow, summ;
-    __attribute__((aligned(32)))float result[INTRINSIC_COUNT];
+    const __attribute__((aligned(32)))float zeroReg[INTRINSIC_COUNT] = {0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f};
 #pragma omp parallel shared(helpArray, Image, Kernel) private(kernelVec, envRow, resultRow, summ) num_threads(THREAD_COUNT)
     {
         if (omp_get_thread_num() == 1 && runCount == 0)
@@ -57,8 +57,8 @@ void Filter(float Image[SIZE][SIZE], const float Kernel[5][5], int runCount) {
         for (int i = 2; i < SIZE - 2; i++) {
             LOG("ThreadID: %i\n", omp_get_thread_num());
             for (int j = 2; j < SIZE - 2; j += 8) {
-                memset(result, 0, INTRINSIC_COUNT);
-                summ = _mm256_load_ps(result);
+                //memset(zeroReg, 0, INTRINSIC_COUNT);
+                summ = _mm256_load_ps(zeroReg);
                 for (int k = 0; k < 5; k++) {
                     for (int l = 0; l < 5; l++) {
                         kernelVec = _mm256_load_ps(&helpArray[k][l][0]);

@@ -29,7 +29,7 @@ void Filter(float Image[SIZE][SIZE], const float Kernel[5][5]) {
     __attribute__((aligned(32))) float helpArray[5][5][INTRINSIC_COUNT];
     int i,j,k,l,b,h;
     __m256 kernelVec, envRow, resultRow, summ;
-    __attribute__((aligned(32)))float result[INTRINSIC_COUNT];
+    const __attribute__((aligned(32)))float zeroReg[INTRINSIC_COUNT] = {0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f};
 
     for(k = 0; k < 5; k++) {
       for (l = 0; l < 5; l++) {
@@ -41,8 +41,7 @@ void Filter(float Image[SIZE][SIZE], const float Kernel[5][5]) {
 
     for(i=2;i<SIZE-2;i++) {
         for(j=2;j<SIZE-2;j+=8) {
-            memset(result, 0, INTRINSIC_COUNT);
-            summ = _mm256_load_ps(result);
+            summ = _mm256_load_ps(zeroReg);
             for(k=0;k<5;k++){
                 for(l=0;l<5;l++){
                     kernelVec = _mm256_load_ps(&helpArray[k][l][0]);

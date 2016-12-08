@@ -35,7 +35,7 @@ int main()
     LOG("\nRigthMat:\n");
     printMatrix(rigthMat);
 #endif
-    for (i = 2000; i < MAX_THREAD_COUNT; i+=100) {
+    for (i = 100; i < MAX_THREAD_COUNT; i+=100) {
         for (j = 0; j < RUN_COUNT; ++j) {
             t1 = getTime();
             omp_set_num_threads(i);
@@ -73,7 +73,7 @@ void matMult()
 {
     int i,j,k = 0;
     char host[80];
-#pragma omp target data device(0) map(to:leftMat,rigthMat) map(tofrom:resultMat) map(alloc: i,j,k,host)
+#pragma omp target device(0) map(to:leftMat,rigthMat) map(tofrom:resultMat) map(alloc: i,j,k,host)
     {
         gethostname(host, 80);
         printf("Running on %s\n",host);

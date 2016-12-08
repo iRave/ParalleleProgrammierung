@@ -2,10 +2,10 @@
 #include<time.h>
 #include<stdlib.h>
 
-#define MAT_SIZE 5
-#define MAX_RAND 10
+#define MAT_SIZE 10
+#define ACCURACY 100
 
-void init(double leftMat[MAT_SIZE][MAT_SIZE], double rightMat[MAT_SIZE][MAT_SIZE]);
+void init(double leftMat[MAT_SIZE][MAT_SIZE], double rightMat[MAT_SIZE][MAT_SIZE], double resultMat[MAT_SIZE][MAT_SIZE]);
 void matMult(double leftMat[MAT_SIZE][MAT_SIZE], double rigthMat[MAT_SIZE][MAT_SIZE], double resultMat[MAT_SIZE][MAT_SIZE]);
 void printMatrix(double matrix[MAT_SIZE][MAT_SIZE]);
 
@@ -13,7 +13,7 @@ int main()
 {
   double leftMat[MAT_SIZE][MAT_SIZE], rigthMat[MAT_SIZE][MAT_SIZE], resultMat[MAT_SIZE][MAT_SIZE];
 
-  init(leftMat, rigthMat);
+  init(leftMat, rigthMat, resultMat);
   printf("leftMat:\n");
   printMatrix(leftMat);
   printf("\nRigthMat:\n");
@@ -23,15 +23,16 @@ int main()
   printMatrix(resultMat);
 }
 
-void init(double leftMat[MAT_SIZE][MAT_SIZE], double rigthMat[MAT_SIZE][MAT_SIZE])
+void init(double leftMat[MAT_SIZE][MAT_SIZE], double rigthMat[MAT_SIZE][MAT_SIZE], double resultMat[MAT_SIZE][MAT_SIZE])
 {
   srand(time(NULL));
   for(int i = 0; i < MAT_SIZE; i++)
   {
     for(int j = 0; j < MAT_SIZE; j++)
     {
-      leftMat[i][j] = (double)(rand() % MAX_RAND);
-      rigthMat[i][j] = (double)(rand() % MAX_RAND);
+      leftMat[i][j] = ((double)(rand() % ACCURACY))/ACCURACY;
+      rigthMat[i][j] = ((double)(rand() % ACCURACY))/ACCURACY;
+      resultMat[i][j] = 0.0;
     }
   }
 }

@@ -23,7 +23,7 @@ int main()
 {
     double singleTime = 0;
     double averageTime = 0;
-
+    int i;
     init();
 #ifdef DEBUG
     LOG("leftMat:\n");
@@ -31,7 +31,7 @@ int main()
     LOG("\nRigthMat:\n");
     printMatrix(rigthMat);
 #endif
-  for(int i = 0; i < RUN_COUNT; i++)
+  for(i = 0; i < RUN_COUNT; i++)
   {
     singleTime = getTime();
     matMult();

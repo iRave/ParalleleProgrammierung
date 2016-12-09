@@ -13,7 +13,7 @@
 #define ACCURACY 100
 
 void init(void);
-void matMult(void);
+double matMult(void);
 void printMatrix(void);
 double getTime(void);
 
@@ -54,7 +54,7 @@ void init()
     }
 }
 
-void matMult()
+double matMult()
 {
     int i,j,k = 0;
     for (i = 0; i < MAT_SIZE; i++){

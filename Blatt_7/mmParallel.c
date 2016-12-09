@@ -14,9 +14,9 @@
 
 #define MAT_SIZE 2000
 #define ACCURACY 100
-#define MAX_THREAD_COUNT 40
-#define START 40
-#define RUN_COUNT 1
+#define MAX_THREAD_COUNT 240
+#define START 1
+#define RUN_COUNT 5
 
 typedef struct SmatmultReturn{
     double execTime;
@@ -25,31 +25,33 @@ typedef struct SmatmultReturn{
 } MatmultReturn;
 
 void init(void);
-void matMult(MatmultReturn *ret);
+void matMult(MatmultReturn *ret, int threadCound);
 void printMatrix(double **);
 #pragma omp declare target
 double getTime(void);
 #pragma omp end declare target
 
 double leftMat[MAT_SIZE][MAT_SIZE], rigthMat[MAT_SIZE][MAT_SIZE], resultMat[MAT_SIZE][MAT_SIZE];
+
 int main()
 {
     double execTimes=0, copyFromTimes=0, copyToTimes=0, minTime=DBL_MAX;
     int i,j, fastestThreadCount;
     MatmultReturn matMultTimes;
-
+    omp_set_dynamic(0);
     init();
+
 #ifdef DEBUG
     LOG("leftMat:\n");
     printMatrix(leftMat);
     LOG("\nRigthMat:\n");
     printMatrix(rigthMat);
 #endif
+
     for (i = START; i <= MAX_THREAD_COUNT; i+=10) {
         for (j = 0; j < RUN_COUNT; ++j) {
-            //init();
-            omp_set_num_threads(i);
-            matMult(&matMultTimes);
+            //omp_set_num_threads(i);
+            matMult(&matMultTimes, i);
             execTimes += matMultTimes.execTime;
             copyToTimes += matMultTimes.copyTimeTo;
             copyFromTimes += matMultTimes.copyTimeFrom;
@@ -86,30 +88,38 @@ void init()
     }
 }
 
-void matMult(MatmultReturn *ret) {
+void matMult(MatmultReturn *ret, int threadCount) {
     double locExecTime;
     ret->copyTimeTo = getTime();
-#pragma omp target data device(0) map(to:leftMat,rigthMat) map(tofrom:resultMat)
+    //omp_set_num_threads(10);
+    #pragma omp target data device(0) map(to:leftMat,rigthMat, threadCount) map(tofrom:resultMat)
+
     {
         ret->copyTimeTo = getTime() - ret->copyTimeTo;
-#pragma omp target device(0) map(from:locExecTime)
+        #pragma omp target device(1) map(from:locExecTime)
         {
             int i, j, k;
-#ifdef DEBUG
+
+            #ifdef DEBUG
             char host[80];
             gethostname(host, 80);
             LOG("Running on %s\n", host);
-#endif
+            #endif
+
             locExecTime = getTime();
             LOG("Local time1: %lf\n",locExecTime);
-#pragma omp parallel for
+            
+            omp_set_num_threads(threadCount);
+            #pragma omp parallel for
             for (i = 0; i < MAT_SIZE; i++) {
+        //        printf("ThreadID: %d\n", omp_get_thread_num());
                 for (j = 0; j < MAT_SIZE; j++) {
                     for (k = 0; k < MAT_SIZE; k++) {
                         resultMat[i][j] += leftMat[i][k] * rigthMat[k][j];
                     }
                 }
             }
+            
             locExecTime = getTime() - locExecTime;
             LOG("Local time2: %lf\n",locExecTime);
         }

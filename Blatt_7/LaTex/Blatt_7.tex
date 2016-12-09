@@ -1,0 +1,83 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[ngerman]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage [autostyle]{csquotes}
+\MakeOuterQuote{"}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{subcaption}
+\usepackage{color}
+\usepackage{float}
+\usepackage{mathabx}
+\usepackage[dvipsnames, listings]{xcolor}
+\colorlet{keywordstylecolor}{green!40!black}
+\colorlet{commentstyle}{purple!40!black}
+\usepackage{graphicx}
+\usepackage{listings}
+\lstdefinestyle{customc}{
+  belowcaptionskip=1\baselineskip,
+  breaklines=true,
+  frame=L,
+  xleftmargin=\parindent,
+  language=C,
+  showstringspaces=false,
+  basicstyle=\footnotesize\ttfamily,
+  keywordstyle=\bfseries\color{keywordstylecolor},
+  commentstyle=\itshape\color{commentstyle},
+  identifierstyle=\color{blue},
+  stringstyle=\color{orange},
+  numbers=left,
+  stepnumber=5,
+  numberfirstline=false,
+  tabsize=2,
+  breaklines=true,
+  prebreak=\small\symbol{'134}
+}
+\lstdefinestyle{Bash}
+{
+  language=Bash,
+  backgroundcolor=\color{Gray},
+  keywordstyle=\color{BlueViolet}\bfseries,
+  commentstyle=\color{Grey},
+  stringstyle=\color{Red},
+  showstringspaces=false,
+  basicstyle=\small\color{white},
+  numbers=none,
+  captionpos=b,
+  tabsize=4,
+  breaklines=true
+}
+\usepackage{siunitx}
+\author{Till Busse, Florian Ölsner}
+\title{Parallele Programmierung Blatt 7}
+\begin{document}
+\maketitle
+\pagebreak
+\section{Matrix-Multiplikation auf Xeon Phi}
+\subsection{Serielles Programm}
+Das serielle Programm benötig für die Berechnung der matrixmultiplikation im Durchschnitt 4,382s. Im folgenden ist der verwendete Programmcode abgebildet.
+\lstinputlisting[firstline=0,language=c,escapechar=@,style=customc,caption=Serielles Programm,label=code:seriell]{../mmSerial.c}
+\pagebreak
+\subsection{Paralleles Programm}
+\lstinputlisting[linerange={89-97,103-121},language=c,escapechar=@,style=customc,caption=Parallele Matrixmultiplikation,label=code: parallel]{../mmParallel.c}
+\subsection{Zeitermittlung Kopiervorgänge}
+\begin{table}[H]
+  \begin{tabular}{|c|c|c|} \hline
+    \textbf{Run} & \textbf{Copy time TO MIC (ms)} & \textbf{Copy time FROM MIC (ms)} \\\hline
+    $1$ & 364,59 & 12,45 \\\hline
+    $2$ & 359,97 & 11,62 \\\hline
+    $3$ & 350,88 & 11,81 \\\hline
+    $4$ & 353,03 & 12,61 \\\hline
+    $5$ & 352,02 & 11,75 \\\hline
+    $6$ & 352,12 & 11,74 \\\hline
+    $7$ & 360,16 & 13,48 \\\hline
+    $8$ & 354,19 & 11,89 \\\hline
+    $\diameter$ & 355.87 & 12.17 \\\hline
+  \end{tabular}
+  \caption{Kopiervorgänge}
+  \label{table:kopiervorgänge}
+\end{table}
+Die Zeiten wurden mit dem code aus Listing \ref{code: parallel} erfasst.
+\end{document}

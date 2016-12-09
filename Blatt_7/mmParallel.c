@@ -14,18 +14,21 @@
 
 #define MAT_SIZE 2000
 #define ACCURACY 100
-#define MAX_THREAD_COUNT 10000
+#define MAX_THREAD_COUNT 4080
 #define RUN_COUNT 10
 
 void init(void);
-void matMult(void);
+double matMult(void);
 void printMatrix(void);
+#pragma omp declare target
 double getTime(void);
+#pragma omp end declare target
+
 
 double leftMat[MAT_SIZE][MAT_SIZE], rigthMat[MAT_SIZE][MAT_SIZE], resultMat[MAT_SIZE][MAT_SIZE];
 int main()
 {
-    double t1=0, times=0,minTime=DBL_MAX;
+    double times=0,minTime=DBL_MAX;
     int i,j, fastestThreadCount;
 
     init();
@@ -35,12 +38,10 @@ int main()
     LOG("\nRigthMat:\n");
     printMatrix(rigthMat);
 #endif
-    for (i = 100; i < MAX_THREAD_COUNT; i+=100) {
+    for (i = 1; i < MAX_THREAD_COUNT; i++) {
         for (j = 0; j < RUN_COUNT; ++j) {
-            t1 = getTime();
             omp_set_num_threads(i);
-            matMult();
-            times += getTime() - t1;
+            times += matMult();
         }
         times /= RUN_COUNT;
         printf("ThreadCount: %i\nTime: %.8lf\n", i,times);
@@ -69,14 +70,16 @@ void init()
     }
 }
 
-void matMult()
+double matMult()
 {
     int i,j,k = 0;
     char host[80];
-#pragma omp target device(0) map(to:leftMat,rigthMat) map(tofrom:resultMat) map(alloc: i,j,k,host)
+    double t1,time;
+#pragma omp target device(0) map(to:leftMat,rigthMat) map(tofrom:resultMat) map(alloc: i,j,k,host,t1) map(from:time)
     {
         gethostname(host, 80);
-        printf("Running on %s\n",host);
+        LOG("Running on %s\n",host);
+        t1 = getTime();
 #pragma omp parallel for
         for (i = 0; i < MAT_SIZE; i++){
             for (j = 0; j < MAT_SIZE; j++) {
@@ -85,7 +88,9 @@ void matMult()
                 }
             }
         }
+        time = getTime() - t1;
     }
+    return time;
 }
 
 double getTime(){  /* elapsed time in ms */

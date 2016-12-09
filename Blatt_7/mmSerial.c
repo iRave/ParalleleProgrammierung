@@ -11,6 +11,7 @@
 
 #define MAT_SIZE 2000
 #define ACCURACY 100
+#define RUN_COUNT 100
 
 void init(void);
 double matMult(void);
@@ -20,7 +21,8 @@ double getTime(void);
 double leftMat[MAT_SIZE][MAT_SIZE], rigthMat[MAT_SIZE][MAT_SIZE], resultMat[MAT_SIZE][MAT_SIZE];
 int main()
 {
-    double t1=0;
+    double singleTime = 0;
+    double averageTime = 0;
 
     init();
 #ifdef DEBUG
@@ -29,10 +31,13 @@ int main()
     LOG("\nRigthMat:\n");
     printMatrix(rigthMat);
 #endif
-    t1 = getTime();
+  for(int i = 0; i < RUN_COUNT; i++)
+  {
+    singleTime = getTime();
     matMult();
-    t1 = getTime() - t1;
-    printf("Time: %.8lf\n", t1);
+    averageTime += getTime() - singleTime;
+  }
+    printf("Time: %.8lf\n", averageTime/RUN_COUNT);
 #ifdef DEBUG
     LOG("\nresultMat:\n");
     printMatrix(resultMat);

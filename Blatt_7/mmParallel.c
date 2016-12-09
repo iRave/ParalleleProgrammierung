@@ -12,14 +12,16 @@
 #define LOG(...)
 #endif
 
-#define MAT_SIZE 20
+#define MAT_SIZE 2000
 #define ACCURACY 100
-#define MAX_THREAD_COUNT 71
-#define RUN_COUNT 10
+#define MAX_THREAD_COUNT 40
+#define START 40
+#define RUN_COUNT 1
 
 typedef struct SmatmultReturn{
     double execTime;
-    double copyTime;
+    double copyTimeTo;
+    double copyTimeFrom;
 } MatmultReturn;
 
 void init(void);
@@ -32,7 +34,7 @@ double getTime(void);
 double leftMat[MAT_SIZE][MAT_SIZE], rigthMat[MAT_SIZE][MAT_SIZE], resultMat[MAT_SIZE][MAT_SIZE];
 int main()
 {
-    double execTimes=0,copyToTimes=0,minTime=DBL_MAX;
+    double execTimes=0, copyFromTimes=0, copyToTimes=0, minTime=DBL_MAX;
     int i,j, fastestThreadCount;
     MatmultReturn matMultTimes;
 
@@ -43,20 +45,26 @@ int main()
     LOG("\nRigthMat:\n");
     printMatrix(rigthMat);
 #endif
-    for (i = 70; i < MAX_THREAD_COUNT; i+=10) {
+    for (i = START; i <= MAX_THREAD_COUNT; i+=10) {
         for (j = 0; j < RUN_COUNT; ++j) {
+            //init();
             omp_set_num_threads(i);
             matMult(&matMultTimes);
             execTimes += matMultTimes.execTime;
-            copyToTimes += matMultTimes.copyTime;
+            copyToTimes += matMultTimes.copyTimeTo;
+            copyFromTimes += matMultTimes.copyTimeFrom;
         }
         execTimes /= RUN_COUNT;
         copyToTimes /= RUN_COUNT;
-        printf("ThreadCount: %i\nTime: %.8lf\nCopyToTime: %.8lf\n", i,execTimes,copyToTimes);
+        copyFromTimes /= RUN_COUNT;
+        printf("ThreadCount: %i\nTime: %.8lf\nCopyToTime: %.8lf\nCopyFromTime: %8lf\n", i,execTimes,copyToTimes,copyFromTimes);
         if(execTimes < minTime) {
             minTime = execTimes;
             fastestThreadCount = i;
         }
+        execTimes = 0;
+        copyToTimes = 0;
+        copyFromTimes = 0;
     }
     printf("Fastest execution took %.2lf ms with %d threads.\n", minTime, fastestThreadCount);
 #ifdef DEBUG
@@ -80,10 +88,10 @@ void init()
 
 void matMult(MatmultReturn *ret) {
     double locExecTime;
-    ret->copyTime = getTime();
+    ret->copyTimeTo = getTime();
 #pragma omp target data device(0) map(to:leftMat,rigthMat) map(tofrom:resultMat)
     {
-        ret->copyTime = getTime() - ret->copyTime;
+        ret->copyTimeTo = getTime() - ret->copyTimeTo;
 #pragma omp target device(0) map(from:locExecTime)
         {
             int i, j, k;
@@ -105,7 +113,9 @@ void matMult(MatmultReturn *ret) {
             locExecTime = getTime() - locExecTime;
             LOG("Local time2: %lf\n",locExecTime);
         }
+        ret->copyTimeFrom = getTime();
     }
+    ret->copyTimeFrom = getTime() - ret->copyTimeFrom;
     LOG("Returned time from mic0: %lf\n",locExecTime);
     ret->execTime = locExecTime;
 }

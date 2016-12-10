@@ -12,3 +12,6 @@ cmake-build-debug
 *.dvi
 *.fls
 *.fdb_latexmk
+
+.DS_Store
+.idea

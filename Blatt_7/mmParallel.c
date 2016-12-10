@@ -4,9 +4,9 @@
 #include <omp.h>
 #include <sys/time.h>
 #include <float.h>
-#include <unistd.h>
 
 #ifdef DEBUG
+#include <unistd.h>
 #define LOG(...) printf(__VA_ARGS__)
 #else
 #define LOG(...)
@@ -14,9 +14,9 @@
 
 #define MAT_SIZE 2000
 #define ACCURACY 100
-#define MAX_THREAD_COUNT 240
-#define START 1
-#define RUN_COUNT 5
+#define START 160
+#define MAX_THREAD_COUNT 300
+#define RUN_COUNT 1
 
 typedef struct SmatmultReturn{
     double execTime;
@@ -36,7 +36,7 @@ double leftMat[MAT_SIZE][MAT_SIZE], rigthMat[MAT_SIZE][MAT_SIZE], resultMat[MAT_
 int main()
 {
     double execTimes=0, copyFromTimes=0, copyToTimes=0, minTime=DBL_MAX;
-    int i,j, fastestThreadCount;
+    int fastestThreadCount;
     MatmultReturn matMultTimes;
     omp_set_dynamic(0);
     init();
@@ -48,8 +48,8 @@ int main()
     printMatrix(rigthMat);
 #endif
 
-    for (i = START; i <= MAX_THREAD_COUNT; i+=10) {
-        for (j = 0; j < RUN_COUNT; ++j) {
+    for (int i = START; i <= MAX_THREAD_COUNT; i+=10) {
+        for (int j = 0; j < RUN_COUNT; ++j) {
             //omp_set_num_threads(i);
             matMult(&matMultTimes, i);
             execTimes += matMultTimes.execTime;
@@ -78,9 +78,9 @@ int main()
 void init()
 {
     srand(time(NULL));
-    int i,j;
-    for(i = 0; i < MAT_SIZE; i++) {
-        for(j = 0; j < MAT_SIZE; j++) {
+    #pragma omp parallel for
+    for(int i = 0; i < MAT_SIZE; i++) {
+        for(int j = 0; j < MAT_SIZE; j++) {
             leftMat[i][j] = ((double)(rand() % ACCURACY))/ACCURACY;
             rigthMat[i][j] = ((double)(rand() % ACCURACY))/ACCURACY;
             resultMat[i][j] = 0.0;
@@ -98,7 +98,7 @@ void matMult(MatmultReturn *ret, int threadCount) {
         ret->copyTimeTo = getTime() - ret->copyTimeTo;
         #pragma omp target device(1) map(from:locExecTime)
         {
-            int i, j, k;
+            //int i, j, k;
 
             #ifdef DEBUG
             char host[80];
@@ -111,10 +111,11 @@ void matMult(MatmultReturn *ret, int threadCount) {
             
             omp_set_num_threads(threadCount);
             #pragma omp parallel for
-            for (i = 0; i < MAT_SIZE; i++) {
+            for (int i = 0; i < MAT_SIZE; i++) {
         //        printf("ThreadID: %d\n", omp_get_thread_num());
-                for (j = 0; j < MAT_SIZE; j++) {
-                    for (k = 0; k < MAT_SIZE; k++) {
+                for (int j = 0; j < MAT_SIZE; j++) {
+                    #pragma omp simd
+                    for (int k = 0; k < MAT_SIZE; k++) {
                         resultMat[i][j] += leftMat[i][k] * rigthMat[k][j];
                     }
                 }
@@ -139,9 +140,8 @@ double getTime(){  /* elapsed time in ms */
 
 void printMatrix(double **matrix)
 {
-    int i,j;
-    for (i = 0; i < MAT_SIZE; i++) {
-        for (j = 0; j < MAT_SIZE; j++) {
+    for (int i = 0; i < MAT_SIZE; i++) {
+        for (int j = 0; j < MAT_SIZE; j++) {
             LOG("| %.2f", matrix[i][j]);
         }
         LOG("\n");

@@ -1,0 +1,76 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[ngerman]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage [autostyle]{csquotes}
+\MakeOuterQuote{"}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{color}
+\usepackage{xcolor}
+\colorlet{keywordstylecolor}{green!40!black}
+\colorlet{commentstyle}{purple!40!black}
+\usepackage[final]{pdfpages}
+\usepackage{listings}
+\lstdefinestyle{customc}{
+  belowcaptionskip=1\baselineskip,
+  breaklines=true,
+  frame=L,
+  xleftmargin=\parindent,
+  language=C,
+  showstringspaces=false,
+  basicstyle=\footnotesize\ttfamily,
+  keywordstyle=\bfseries\color{keywordstylecolor},
+  commentstyle=\itshape\color{commentstyle},
+  identifierstyle=\color{blue},
+  stringstyle=\color{orange},
+  numbers=left,
+  stepnumber=5,
+  numberfirstline=false,
+  tabsize=2,
+  breaklines=true,
+  prebreak=\small\symbol{'134}
+}
+\usepackage{siunitx}
+\author{Till Busse, Florian Ölsner}
+\title{Parallele Programmierung Blatt 4}
+\begin{document}
+\maketitle
+\pagebreak
+\section{Parallelisierung mit OpenMP}
+\subsection{Problem 1:}
+\lstinputlisting[firstline=35,lastline=49,language=c,escapechar=@,style=customc,caption=Programmcode]{../Blatt4_OpenMP_A1.c}
+\subsection{Problem 2:}
+\lstinputlisting[firstline=51,lastline=78,language=c,escapechar=@,style=customc,caption=Programmcode]{../Blatt4_OpenMP_A1.c}
+\subsection{Problem 3:}
+%\includepdf[pages=5-6]{../23-parallel-scan.pdf}
+\lstinputlisting[firstline=94,lastline=161,language=c,escapechar=@,style=customc,caption=Programmcode]{../Blatt4_OpenMP_A1.c}
+Der präsentierte code berechnet die Präfixsumme der in B enthaltenden Elemente. Dabei wird davon ausgegangen, dass A[0]=0. Außerdem wird das Element B[0] ebenfalls in die Summe mit einbezogen, demzufolge unterscheidet sich die parallele Lösung geringfügig vom seriellen Algorithmus.
+\newpage
+\section{Parallele Approximation von $\pi$}
+\subsection{Sequentielles Programm:}
+\lstinputlisting[firstline=31,lastline=45,language=c,escapechar=@,style=customc,caption=Programmcode]{../Blatt4_OpenMP_A2.c}
+\subsection{Thread Paralleles Programm:}
+\lstinputlisting[firstline=50,lastline=64,language=c,escapechar=@,style=customc,caption=Programmcode]{../Blatt4_OpenMP_A2.c}
+\subsection{Leistungssteigerung:}
+\subsubsection{Bash Script:}
+Zum ermitteln der Leistungssteigerung wurde das Programm mehrmals mit unterschiedlichen Parametern ausgeführt. Hierzu diente das folgende Script:
+\lstinputlisting[firstline=0,language=Bash,escapechar=@,style=customc,caption=Programmcode]{../performance.sh}
+\subsubsection{Ergebnis:}
+Die Programme wurden jeweils mit verschiedenen Threadanzahlen und Problemgrößen ausgeführt und der Speedup zum seriellen Programm jeweils ermittelt. Die optimale Anzahl an Threads liegt zwischen 256 und 512, wie unten zu sehen für N=128.000.000. Für größere N steigt der Speedup weiter an, das Optimum verschiebt sich jedoch nicht.
+\lstinputlisting[linerange={419-467},language=Bash,escapechar=@,style=customc,caption=Programmcode]{../A2Speed.txt}
+\newpage
+%3
+\section{Quicksort mit OpenMP}
+\subsection{Parallelisierung}
+Im Folgenden ist der Code für die Parallelisierung des Quicksort Algorithmus zu sehen. Um die in Aufgabe 3.2 gestellten Anforderungen zu erfüllen wurde die Parameterliste des Quicksort Algorithmus um das Element 'depth' erweitert und die OpenMP Direktive "if" eingeführt.
+\lstinputlisting[linerange={0},language=C,escapechar=@,style=customc,caption=Programmcode]{../Blatt4_OpenMP_A3_Final.c}
+Den obigen code könnte man theoretisch noch weiter parallelisieren, wie in dem folgenden Listing gezeigt. Die Idee besteht darin, das Suchen des nächsten Paares auf 2 Threads auszulagern. Durch diese Parallelisierung arbeitet das Programm jedoch ineffizienter, da zusätzliche Synchronisationsmaßnahmen erforderlich sind (Barrieren). In der Regel werden die while schleifen nur für wenige Iterationen durchlaufen. Die Implementierung würde sich nur für sehr große, vorsortierte Arrays lohnen.
+\lstinputlisting[linerange={23-48},language=Bash,escapechar=@,style=customc,caption=Programmcode]{../AnotherAttempt.c}
+\subsection{Performance Analyse}
+Der Speedup wurde für verschiedene Threadanzahlen jeweils mehrfach gemessen. Der durchschnittliche Speedup bei 2 Threads liegt zwischen 5 und 7, eine weitere Erhöhung der Threadanzahl verlangsamen das Programm. Dies liegt daran, dass pro rekursiven Aufruf nur maximal 2 Threads effektiv genutzt werden.
+\lstinputlisting[linerange={23-44,281-302},language=Bash,escapechar=@,style=customc,caption=Programmcode]{../A3Speedup.txt}
+\subsection{Verbesserung des Algorithmus}
+Der Algorithmus könnte weiter optimiert werden, indem mehrere Pivotelemente gewählt werden. Somit können pro Rekursionsschritt mehr als 3 Threads beschäftigt werden und die maximale Parallelität wird früher erreicht. Außerdem könnte die Suche nach den zu tauschenden Elementen angepasst werden. Das Array könnte in k gleich große Teile aufgetrennt werden (Datendekomposition), die jeweils ein Thread durchsucht. Die Elemente werden dann entweder in ein neue Array geschrieben oder über Threadkommunikation ausgetauscht.
+\end{document}

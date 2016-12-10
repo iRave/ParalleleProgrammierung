@@ -1,0 +1,52 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[ngerman]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage [autostyle]{csquotes}
+\MakeOuterQuote{"}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{color}
+\usepackage{xcolor}
+\colorlet{keywordstylecolor}{green!40!black}
+\colorlet{commentstyle}{purple!40!black}
+\usepackage{listings}
+\lstdefinestyle{customc}{
+  belowcaptionskip=1\baselineskip,
+  breaklines=true,
+  frame=L,
+  xleftmargin=\parindent,
+  language=C,
+  showstringspaces=false,
+  basicstyle=\footnotesize\ttfamily,
+  keywordstyle=\bfseries\color{keywordstylecolor},
+  commentstyle=\itshape\color{commentstyle},
+  identifierstyle=\color{blue},
+  stringstyle=\color{orange},
+  numbers=left,
+  stepnumber=5,
+  numberfirstline=false,
+  tabsize=2,
+  breaklines=true,
+  prebreak=\small\symbol{'134}
+}
+\usepackage{siunitx}
+\author{Till Busse, Florian Ölsner}
+\title{Parallele Programmierung Blatt 5}
+\begin{document}
+\maketitle
+\pagebreak
+\section{Ping-Pong mit MPI}
+\subsection{Programmcode für PingPong}
+\lstinputlisting[firstline=0,language=c,escapechar=@,style=customc,caption=Programmcode]{../mpiA1.c}
+\subsection{Kommunikationszeit}
+Bei N=1000 Durchläufen haben wir eine durchschnittliche Latenz von 0.0000012324s auf dem Xeon Phi gemessen.
+\section{Mandelbrot-Menge}
+\subsection{Vorueberlegung zur Parallelisierung}
+Die Datendekomposition kann unterschiedlich durchgeführt werden. Die einfachst Möglichkeit wäre eine reine Blockaufteilung der Bildpunkte in Form von Streifen (entweder horizontal oder vertikal). Der Vorteil dieser Variante ist, dass die Ergebnisdaten einfach mithilfe der MPI-Gather Methode wieder zusammengeführt werden können. Der Nachteil ist für diese Variante jedoch, dass die weißen Bildreiche aufwändiger zu berechnen sind als die Schwarzen. Deshalb hätten bestimmte Prozesse deutlich mehr zu berechnen als andere. Um die Lastverteilung besser zu verteilen, können die Bildpunkte auch Zeilen bzw. spaltenweise zyklisch auf die Prozesse aufgeteilt werden. Der Nachteil diesmal ist die aufwändigere Zusammenführung der Daten. Außerdem könnte diese Variante Cache-ineffizienter sein, je nach Richtung der Aufteilung, da immer nur ein Punkt pro Cachezeile geladen werden könnte. Eine grafische Darstellung dieser Erklärung halten wir nicht für sinnvoll.
+\subsection{Prozessparallele Implementierung}
+\lstinputlisting[firstline=0,language=c,escapechar=@,style=customc,caption=Programmcode]{../paraMandel.c}
+\subsection{Speedup}
+\lstinputlisting[firstline=5,language=bash,escapechar=@,style=customc,caption=Programmcode]{../out.txt}
+\end{document}

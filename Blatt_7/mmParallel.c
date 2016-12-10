@@ -14,8 +14,8 @@
 
 #define MAT_SIZE 2000
 #define ACCURACY 100
-#define START 230
-#define MAX_THREAD_COUNT START+1
+#define START 10
+#define MAX_THREAD_COUNT 300
 #define RUN_COUNT 1
 
 typedef struct SmatmultReturn{
@@ -96,7 +96,7 @@ void matMult(MatmultReturn *ret, int threadCount) {
         ret->copyTimeTo = getTime() - ret->copyTimeTo;
         #pragma offload target(mic) out(locExecTime)
         {
-            int i, j, k;
+            //int i, j, k;
 
             #ifdef DEBUG
             char host[80];
@@ -109,10 +109,11 @@ void matMult(MatmultReturn *ret, int threadCount) {
             
             omp_set_num_threads(threadCount);
             #pragma omp parallel for
-            for (i = 0; i < MAT_SIZE; i++) {
+            for (int i = 0; i < MAT_SIZE; i++) {
         //        printf("ThreadID: %d\n", omp_get_thread_num());
-                for (j = 0; j < MAT_SIZE; j++) {
-                    for (k = 0; k < MAT_SIZE; k++) {
+                for (int j = 0; j < MAT_SIZE; j++) {
+                    #pragma omp simd
+                    for (int k = 0; k < MAT_SIZE; k++) {
                         resultMat[i][j] += leftMat[i][k] * rigthMat[k][j];
                     }
                 }

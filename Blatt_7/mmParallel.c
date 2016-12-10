@@ -14,9 +14,9 @@
 
 #define MAT_SIZE 2000
 #define ACCURACY 100
-#define MAX_THREAD_COUNT 240
-#define START 1
-#define RUN_COUNT 5
+#define START 230
+#define MAX_THREAD_COUNT START+1
+#define RUN_COUNT 1
 
 typedef struct SmatmultReturn{
     double execTime;
@@ -92,11 +92,9 @@ void matMult(MatmultReturn *ret, int threadCount) {
     double locExecTime;
     ret->copyTimeTo = getTime();
     //omp_set_num_threads(10);
-    #pragma omp target data device(0) map(to:leftMat,rigthMat, threadCount) map(tofrom:resultMat)
-
-    {
+    #pragma offload_transfer target(mic) in(leftMat,rigthMat, threadCount, resultMat)
         ret->copyTimeTo = getTime() - ret->copyTimeTo;
-        #pragma omp target device(1) map(from:locExecTime)
+        #pragma offload target(mic) out(locExecTime)
         {
             int i, j, k;
 
@@ -124,7 +122,7 @@ void matMult(MatmultReturn *ret, int threadCount) {
             LOG("Local time2: %lf\n",locExecTime);
         }
         ret->copyTimeFrom = getTime();
-    }
+    #pragma offload_transfer target(mic) out(resultMat)
     ret->copyTimeFrom = getTime() - ret->copyTimeFrom;
     LOG("Returned time from mic0: %lf\n",locExecTime);
     ret->execTime = locExecTime;

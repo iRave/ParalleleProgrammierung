@@ -9,16 +9,16 @@
 #define LOG(...)
 #endif
 
-#define MAT_SIZE 2000
+#define MAT_SIZE 2048
 #define ACCURACY 100
-#define RUN_COUNT 100
+#define RUN_COUNT 3
 
 void init(void);
 double matMult(void);
 void printMatrix(void);
 double getTime(void);
 
-double leftMat[MAT_SIZE][MAT_SIZE], rigthMat[MAT_SIZE][MAT_SIZE], resultMat[MAT_SIZE][MAT_SIZE];
+float leftMat[MAT_SIZE][MAT_SIZE], rigthMat[MAT_SIZE][MAT_SIZE], resultMat[MAT_SIZE][MAT_SIZE];
 int main()
 {
     double singleTime = 0;
@@ -52,8 +52,8 @@ void init()
     {
         for(j = 0; j < MAT_SIZE; j++)
         {
-            leftMat[i][j] = ((double)(rand() % ACCURACY))/ACCURACY;
-            rigthMat[i][j] = ((double)(rand() % ACCURACY))/ACCURACY;
+            leftMat[i][j] = ((float)(rand() % ACCURACY))/ACCURACY;
+            rigthMat[i][j] = ((float)(rand() % ACCURACY))/ACCURACY;
             resultMat[i][j] = 0.0;
         }
     }

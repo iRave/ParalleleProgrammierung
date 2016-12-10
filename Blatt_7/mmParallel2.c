@@ -73,6 +73,7 @@ double matMult()
        gethostname(host, 80);
        printf("%s\n", host);
        #pragma omp parallel for 
+       #pragma omp parallel for simd collapse(3)
        for (int i = 0; i < MAT_SIZE; i++){
             for (int j = 0; j < MAT_SIZE; j++) {
                 for (int k = 0; k < MAT_SIZE; k++) {

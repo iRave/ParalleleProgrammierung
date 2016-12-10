@@ -11,7 +11,7 @@
 
 #define MAT_SIZE 2048
 #define ACCURACY 100
-#define RUN_COUNT 3
+#define RUN_COUNT 10
 
 void init(void);
 double matMult(void);
@@ -61,10 +61,9 @@ void init()
 
 double matMult()
 {
-    int i,j,k = 0;
-    for (i = 0; i < MAT_SIZE; i++){
-        for (j = 0; j < MAT_SIZE; j++) {
-            for (k = 0; k < MAT_SIZE; k++) {
+    for (int i = 0; i < MAT_SIZE; i++){
+        for (int j = 0; j < MAT_SIZE; j++) {
+            for (int k = 0; k < MAT_SIZE; k++) {
                 resultMat[i][j] += leftMat[i][k] * rigthMat[k][j];
             }
         }
